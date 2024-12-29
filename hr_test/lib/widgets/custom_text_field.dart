@@ -9,6 +9,8 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final double verticalPadding;
   final double horizontalPadding;
+  // Added onChanged parameter
+  final ValueChanged<String>? onChanged;
 
   const CustomTextField({
     Key? key,
@@ -20,6 +22,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.verticalPadding = 18.0,
     this.horizontalPadding = 20.0,
+    this.onChanged, // <-- new
   }) : super(key: key);
 
   @override
@@ -29,6 +32,7 @@ class CustomTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
+      onChanged: onChanged, // <-- new
       decoration: InputDecoration(
         labelText: label,
         suffixIcon: suffixIcon,

@@ -4,6 +4,12 @@ import '../providers/auth_provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 
+/// Example palette for background:
+const Color primaryDarkGreen = Color(0xFF1F4529);
+const Color secondaryGreen = Color(0xFF47663B);
+const Color backgroundLight = Color(0xFFE8ECD7);
+const Color accentColor = Color(0xFFEED3B1);
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -13,8 +19,13 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+
+  // Pre-fill username & password
+  final TextEditingController _usernameController =
+  TextEditingController(text: 'superadmin');
+  final TextEditingController _passwordController =
+  TextEditingController(text: 'admin123');
+
   bool _passwordVisible = false;
   String _error = '';
 
@@ -33,11 +44,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       if (success) {
         if (authProvider.currentUser != null &&
-            authProvider.currentUser!.roles
-                .any((r) => r.roleName == 'SuperAdmin')) {
+            authProvider.currentUser!.roles.any((r) => r.roleName == 'SuperAdmin')) {
           Navigator.pushReplacementNamed(context, '/admin');
         } else {
-          // Navigate to other dashboards based on user roles
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Logged in as user'),
@@ -58,16 +67,35 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Card(
-              shape: RoundedRectangleBorder(
+      // Enhanced background with gradient
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              secondaryGreen,
+              primaryDarkGreen,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              // Slightly more refined card with transparency effect
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
-              elevation: 6,
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Form(
@@ -83,19 +111,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      // Username Field
                       CustomTextField(
                         label: 'Username',
                         controller: _usernameController,
                         validator: (value) =>
-                        value == null || value.isEmpty ? 'Enter username' : null,
+                        (value == null || value.isEmpty) ? 'Enter username' : null,
                       ),
                       const SizedBox(height: 16),
+                      // Password Field
                       CustomTextField(
                         label: 'Password',
                         controller: _passwordController,
                         obscureText: !_passwordVisible,
                         validator: (value) =>
-                        value == null || value.isEmpty ? 'Enter password' : null,
+                        (value == null || value.isEmpty) ? 'Enter password' : null,
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -110,6 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      // Login Button
                       CustomButton(
                         text: 'Login',
                         icon: Icons.login,

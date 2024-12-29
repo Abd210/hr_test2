@@ -1,10 +1,12 @@
+// lib/utils/theme.dart
+
 import 'package:flutter/material.dart';
 
-// Updated color palette as requested
-const Color primaryDarkGreen = Color(0xFF1F4529);
-const Color secondaryGreen = Color(0xFF47663B);
-const Color backgroundLight = Color(0xFFE8ECD7);
-const Color accentColor = Color(0xFFEED3B1);
+/// Your color palette
+const Color primaryDarkGreen = Color(0xFF1F4529);  // #1F4529
+const Color secondaryGreen = Color(0xFF47663B);   // #47663B
+const Color backgroundLight = Color(0xFFE8ECD7);  // #E8ECD7
+const Color accentColor = Color(0xFFEED3B1);      // #EED3B1
 
 final ThemeData appTheme = ThemeData(
   primaryColor: primaryDarkGreen,
