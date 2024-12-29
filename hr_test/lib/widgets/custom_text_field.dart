@@ -7,6 +7,8 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final double verticalPadding;
+  final double horizontalPadding;
 
   const CustomTextField({
     Key? key,
@@ -16,6 +18,8 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.validator,
     this.suffixIcon,
+    this.verticalPadding = 18.0,
+    this.horizontalPadding = 20.0,
   }) : super(key: key);
 
   @override
@@ -28,7 +32,10 @@ class CustomTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         suffixIcon: suffixIcon,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: verticalPadding,
+          horizontal: horizontalPadding,
+        ),
       ),
     );
   }
