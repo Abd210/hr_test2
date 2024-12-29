@@ -1,16 +1,10 @@
-// lib/screens/dashboard_screen.dart
-// Over 700 lines of advanced Flutter code with animations and professional styling.
-
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../widgets/custom_button.dart';
-import '../widgets/persistent_navbar.dart';
+// Removed import of persistent_navbar.dart because we no longer use it here
 import '../utils/theme.dart';
 
-// A large stateful widget that demonstrates a variety of advanced UI features,
-// animations, charts, etc., all in one file.
-// Note: This is intentionally very long, to meet the 700-line code requirement.
 class DashboardScreen extends StatefulWidget {
   final int currentIndex;
   const DashboardScreen({Key? key, this.currentIndex = 0}) : super(key: key);
@@ -19,9 +13,9 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-// We'll add animations, custom widgets, and more.
+// Use TickerProviderStateMixin because we have multiple AnimationControllers
 class _DashboardScreenState extends State<DashboardScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   // ------------------------------------------------------------
   // 1) Animation Controllers & States
   // ------------------------------------------------------------
@@ -34,11 +28,11 @@ class _DashboardScreenState extends State<DashboardScreen>
   // For advanced radial progress
   double _radialValue = 0.7; // example 70%
 
-  // For some data toggles
+  // Toggles
   bool _showExtraStats = false;
   bool _showTasks = false; // toggles "My Tasks" panel
 
-  // We'll keep a list of "Tasks" for demonstration
+  // Tasks list example
   final List<String> _tasks = [
     'Redesign login form UI',
     'Implement new survey feature',
@@ -75,32 +69,32 @@ class _DashboardScreenState extends State<DashboardScreen>
       value: 35,
       title: '35%',
       radius: 32,
-      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
     ),
     PieChartSectionData(
       color: accentColor,
       value: 30,
       title: '30%',
       radius: 32,
-      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
     ),
     PieChartSectionData(
       color: Colors.orange,
       value: 20,
       title: '20%',
       radius: 32,
-      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
     ),
     PieChartSectionData(
       color: Colors.blueGrey,
       value: 15,
       title: '15%',
       radius: 32,
-      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
     ),
   ];
 
-  // Example "recent activity" items
+  // Example recent activities
   final List<String> _recentActivities = [
     'New user: JohnDoe joined Org A.',
     'Survey #56 completed by 45 users.',
@@ -109,7 +103,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     'Test #99 concluded with 88% pass rate.',
   ];
 
-  // Additional "Stats" to show/hide with _showExtraStats
+  // Additional stats (shown if _showExtraStats == true)
   final List<_ExtraStat> _extraStats = [
     _ExtraStat(title: 'Active Admins', value: 15),
     _ExtraStat(title: 'Pending Surveys', value: 8),
@@ -117,11 +111,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     _ExtraStat(title: 'Employee Retention', value: 96),
   ];
 
-  // For some bounce-like animation in charts
+  // For bounce-like animation in charts
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
 
-  // For a wave-like background painter
+  // For wave-like background painter
   late AnimationController _waveController;
   late Animation<double> _waveAnimation;
 
@@ -189,30 +183,15 @@ class _DashboardScreenState extends State<DashboardScreen>
         builder: (ctx, child) {
           return CustomPaint(
             painter: _WavePainter(_waveAnimation.value),
-            child: Row(
-              children: [
-                // Left nav
-                PersistentNavbar(
-                  currentIndex: widget.currentIndex,
-                  onItemSelected: (index) {
-                    setState(() {
-                      // Possibly navigate or set state
-                    });
-                  },
+            // We remove any top or left nav here — just the core content
+            child: SafeArea(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: _buildMainContent(context),
                 ),
-                // Main content
-                Expanded(
-                  child: SafeArea(
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: _buildMainContent(context),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         },
@@ -224,8 +203,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeaderRow(context),
-        const SizedBox(height: 16),
+        // Removed the header row, so no top bar here
         _buildStatsAndRadial(context),
         const SizedBox(height: 16),
         // Animated expand for bar+pie
@@ -239,7 +217,7 @@ class _DashboardScreenState extends State<DashboardScreen>
         const SizedBox(height: 16),
         if (_showExtraStats) _buildExtraStatsSection(context),
         const SizedBox(height: 16),
-        // Button toggling extra stats
+        // Button to toggle extra stats
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -260,42 +238,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   // --------------------------------------------------------------------------
-  // Header row: Title + Profile
-  // --------------------------------------------------------------------------
-  Widget _buildHeaderRow(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          'Advanced Dashboard',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: primaryDarkGreen,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const Spacer(),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: accentColor.withOpacity(0.95),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: const [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: Colors.black54),
-              ),
-              SizedBox(width: 8),
-              Text('SuperAdmin', style: TextStyle(color: Colors.white)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // --------------------------------------------------------------------------
   // Stats row + radial progress
   // --------------------------------------------------------------------------
   Widget _buildStatsAndRadial(BuildContext context) {
@@ -306,7 +248,6 @@ class _DashboardScreenState extends State<DashboardScreen>
       _MiniStatData('Revenue', '\$12,345', Icons.attach_money, Colors.red),
     ];
 
-    // We'll show 4 stats in a row + radial progress on the right
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -328,7 +269,7 @@ class _DashboardScreenState extends State<DashboardScreen>
               return Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFFE8ECD7),
+                  color: const Color(0xFFE8ECD7),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -348,9 +289,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                       children: [
                         Text(e.title,
                             style: TextStyle(fontSize: 13, color: Colors.grey[800])),
-                        Text(e.value,
-                            style: TextStyle(
-                                fontSize: 16, color: e.color, fontWeight: FontWeight.bold)),
+                        Text(
+                          e.value,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: e.color,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     )
                   ],
@@ -369,14 +315,11 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // --------------------------------------------------------------------------
-  // Radial progress with bounce effect
-  // --------------------------------------------------------------------------
   Widget _buildRadialProgressSection(BuildContext context) {
     return Container(
       height: 180,
       decoration: BoxDecoration(
-        color: Color(0xFFE8ECD7),
+        color: const Color(0xFFE8ECD7),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -399,9 +342,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                 child: Text(
                   '${(_radialValue * 100).toInt()}%',
                   style: TextStyle(
-                      color: primaryDarkGreen,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22),
+                    color: primaryDarkGreen,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                  ),
                 ),
               ),
             ),
@@ -430,9 +374,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // --------------------------------------------------------------------------
-  // Bar chart card
-  // --------------------------------------------------------------------------
   Widget _buildBarChartCard(BuildContext context) {
     return Card(
       elevation: 3,
@@ -477,9 +418,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  // --------------------------------------------------------------------------
-  // Second pie chart
-  // --------------------------------------------------------------------------
   Widget _buildPieChartCard2(BuildContext context) {
     return Card(
       elevation: 3,
@@ -497,35 +435,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                 PieChartData(
                   sections: _pieSections,
                   centerSpaceRadius: 28,
-                  borderData: FlBorderData(show: false),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // Pie chart card from top (kept, but we won't remove your original)
-  // --------------------------------------------------------------------------
-  Widget _buildPieChartCard() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Organizations', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Expanded(
-              child: PieChart(
-                PieChartData(
-                  sections: _pieSections,
-                  centerSpaceRadius: 30,
                   borderData: FlBorderData(show: false),
                 ),
               ),
@@ -594,7 +503,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         duration: const Duration(milliseconds: 600),
         curve: Curves.easeInOut,
         height: _showTasks ? 200 : 60,
-        // If collapsed, show a smaller container. If expanded, show full.
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
@@ -643,7 +551,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFFE8ECD7),
+        color: const Color(0xFFE8ECD7),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -708,7 +616,7 @@ class _RadialPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final strokeWidth = 12.0;
+    const strokeWidth = 12.0;
     final center = Offset(size.width / 2, size.height / 2);
     final radius = math.min(size.width, size.height) / 2 - strokeWidth;
 
@@ -750,7 +658,7 @@ class _WavePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = Colors.white.withOpacity(0.3);
 
-    final waveHeight = 40.0;
+    const waveHeight = 40.0;
     final waveLength = size.width / 1.5;
     final offset = animationValue * waveLength;
     final path = Path();
@@ -792,12 +700,4 @@ class _MiniStatData {
   final IconData icon;
   final Color color;
   _MiniStatData(this.title, this.value, this.icon, this.color);
-}
-
-class _MetricCardData {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-  _MetricCardData(this.title, this.value, this.icon, this.color);
 }
