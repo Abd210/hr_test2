@@ -1,4 +1,5 @@
-//test_model.dart  i have it twice but lazy to delete
+// lib/models/test_model.dart
+
 class TestModel {
   final int id;
   String code;

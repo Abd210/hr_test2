@@ -1,14 +1,12 @@
-//dashboard_Screen.dart
-import 'dart:math' as math;
+// dashboard_screen.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../widgets/custom_button.dart';
-// Removed import of persistent_navbar.dart because we no longer use it here
 import '../utils/theme.dart';
+import 'dart:math' as math;
 
 class DashboardScreen extends StatefulWidget {
-  final int currentIndex;
-  const DashboardScreen({Key? key, this.currentIndex = 0}) : super(key: key);
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -116,10 +114,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
 
-  // For wave-like background painter
-  late AnimationController _waveController;
-  late Animation<double> _waveAnimation;
-
   @override
   void initState() {
     super.initState();
@@ -154,16 +148,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     _bounceAnimation = Tween<double>(begin: 0.0, end: 0.1).animate(
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
-
-    // Wave background
-    _waveController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat();
-    _waveAnimation = CurvedAnimation(
-      parent: _waveController,
-      curve: Curves.linear,
-    );
   }
 
   @override
@@ -171,31 +155,16 @@ class _DashboardScreenState extends State<DashboardScreen>
     _fadeController.dispose();
     _chartExpandController.dispose();
     _bounceController.dispose();
-    _waveController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // Painted wave background
-      body: AnimatedBuilder(
-        animation: _waveController,
-        builder: (ctx, child) {
-          return CustomPaint(
-            painter: _WavePainter(_waveAnimation.value),
-            // We remove any top or left nav here — just the core content
-            child: SafeArea(
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: _buildMainContent(context),
-                ),
-              ),
-            ),
-          );
-        },
+    return FadeTransition(
+      opacity: _fadeAnimation,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: _buildMainContent(context),
       ),
     );
   }
@@ -204,18 +173,20 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Removed the header row, so no top bar here
+        // Stats and Radial Progress
         _buildStatsAndRadial(context),
         const SizedBox(height: 16),
-        // Animated expand for bar+pie
+        // Animated expand for bar+pie charts
         SizeTransition(
           sizeFactor: _chartExpandAnimation,
           axisAlignment: 0.0,
           child: _buildChartsRow(context),
         ),
         const SizedBox(height: 16),
+        // Recent Activities and My Tasks
         _buildRecentActivitiesAndTasks(context),
         const SizedBox(height: 16),
+        // Extra Stats Section
         if (_showExtraStats) _buildExtraStatsSection(context),
         const SizedBox(height: 16),
         // Button to toggle extra stats
@@ -647,45 +618,6 @@ class _RadialPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
-
-// --------------------------------------------------------------------------
-// Wave painter for background
-// --------------------------------------------------------------------------
-class _WavePainter extends CustomPainter {
-  final double animationValue;
-  _WavePainter(this.animationValue);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withOpacity(0.3);
-
-    const waveHeight = 40.0;
-    final waveLength = size.width / 1.5;
-    final offset = animationValue * waveLength;
-    final path = Path();
-    path.moveTo(0, size.height / 2);
-
-    for (double x = -waveLength + offset; x <= size.width + waveLength; x += waveLength) {
-      path.quadraticBezierTo(
-        x + waveLength / 4, size.height / 2 - waveHeight,
-        x + waveLength / 2, size.height / 2,
-      );
-      path.quadraticBezierTo(
-        x + 3 * waveLength / 4, size.height / 2 + waveHeight,
-        x + waveLength, size.height / 2,
-      );
-    }
-
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(_WavePainter oldDelegate) => true;
-}
-
 // --------------------------------------------------------------------------
 // Extra data classes
 // --------------------------------------------------------------------------

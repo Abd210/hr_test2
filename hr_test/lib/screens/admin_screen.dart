@@ -1,20 +1,18 @@
-//admin_screen.dart
+// lib/screens/admin_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// Remove the fl_chart imports you used specifically for the old dashboard if no longer needed
-// import 'package:fl_chart/fl_chart.dart';
-
-// 1) Import your separate DashboardScreen
-import 'dashboard_screen.dart';
-
+import 'dashboard_screen.dart'; // Ensure this no longer has its own background
 import '../providers/admin_provider.dart';
 import '../providers/auth_provider.dart';
 import '../utils/theme.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/persistent_navbar.dart';
+import '../widgets/background_animation.dart'; // Import the BackgroundAnimation widget
 import '../models/test_model.dart';
 import 'manage_questions_screen.dart';
+import '../models/user.dart'; // Ensure you have this import
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({Key? key}) : super(key: key);
@@ -27,21 +25,19 @@ class _AdminScreenState extends State<AdminScreen> {
   // Current tab in the navbar
   int _currentIndex = 0;
 
-  // (Optional) Remove any old chart data or controllers if they were only for the old dashboard:
-  // final List<BarChartGroupData> _barGroups = [...];
-  // final List<PieChartSectionData> _pieSections = [...];
-
-  // For Organizations, Users, Tests
+  // Controllers for Organizations
   final TextEditingController _orgSearchController = TextEditingController();
   final TextEditingController _orgNameController = TextEditingController();
   final TextEditingController _orgDescController = TextEditingController();
 
+  // Controllers for Users
   final TextEditingController _userSearchController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _userEmailController = TextEditingController();
   final TextEditingController _userPasswordController = TextEditingController();
   final TextEditingController _userPhoneController = TextEditingController();
 
+  // Controllers for Tests
   final TextEditingController _testSearchController = TextEditingController();
   final TextEditingController _testCodeController = TextEditingController();
   final TextEditingController _testNameController = TextEditingController();
@@ -76,77 +72,85 @@ class _AdminScreenState extends State<AdminScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     return Scaffold(
-      body: Row(
+      body: Stack(
         children: [
-          // Left persistent navbar
-          PersistentNavbar(
-            currentIndex: _currentIndex,
-            onItemSelected: (index) {
-              setState(() {
-                _currentIndex = index;
-                // If we leave the Tests tab, also close Manage Questions
-                if (_currentIndex != 3) {
-                  _showManageQuestions = false;
-                  _selectedTestForQuestions = null;
-                }
-              });
-            },
-          ),
+          // Background wave animation
+          const BackgroundAnimation(),
 
-          // Main area
-          Expanded(
-            child: Column(
-              children: [
-                // Top bar
-                Container(
-                  height: 60,
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Admin Dashboard',
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+          // Main content
+          Row(
+            children: [
+              // Left persistent navbar
+              PersistentNavbar(
+                currentIndex: _currentIndex,
+                onItemSelected: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                    // If we leave the Tests tab, also close Manage Questions
+                    if (_currentIndex != 3) {
+                      _showManageQuestions = false;
+                      _selectedTestForQuestions = null;
+                    }
+                  });
+                },
+              ),
+
+              // Main area
+              Expanded(
+                child: Column(
+                  children: [
+                    // Top bar
+                    Container(
+                      height: 60,
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Admin Dashboard',
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.logout),
+                            color: Theme.of(context).primaryColor,
+                            onPressed: () {
+                              authProvider.logout();
+                              Navigator.pushReplacementNamed(context, '/');
+                            },
+                            tooltip: 'Logout',
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.logout),
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          authProvider.logout();
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                        tooltip: 'Logout',
+                    ),
+
+                    // Body: 4 tabs in an IndexedStack
+                    Expanded(
+                      child: IndexedStack(
+                        index: _currentIndex,
+                        children: [
+                          // 0 => DashboardScreen
+                          const DashboardScreen(),
+
+                          // 1 => Organizations
+                          _buildOrganizationsTab(),
+
+                          // 2 => Users
+                          _buildUsersTab(),
+
+                          // 3 => Tests
+                          _buildTestsTab(),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-
-                // Body: 4 tabs in an IndexedStack
-                Expanded(
-                  child: IndexedStack(
-                    index: _currentIndex,
-                    children: [
-                      // 0 => REPLACED: Use your new DashboardScreen
-                      DashboardScreen(currentIndex: _currentIndex),
-
-                      // 1 => Organizations
-                      _buildOrganizationsTab(),
-
-                      // 2 => Users
-                      _buildUsersTab(),
-
-                      // 3 => Tests
-                      _buildTestsTab(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -187,6 +191,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () => setState(() {}),
+                      tooltip: 'Search',
                     )
                   ],
                 ),
@@ -203,7 +208,8 @@ class _AdminScreenState extends State<AdminScreen> {
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
                           title: Text(org.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold)),
                           subtitle: Text('Description: ${org.description}'),
                           trailing: SizedBox(
                             width: 100,
@@ -211,13 +217,17 @@ class _AdminScreenState extends State<AdminScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.orange),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.orange),
                                   onPressed: () {
-                                    _showEditOrganizationDialog(org, adminProvider);
+                                    _showEditOrganizationDialog(
+                                        org, adminProvider);
                                   },
+                                  tooltip: 'Edit',
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
                                   onPressed: () {
                                     _confirmDeletion(
                                       title: 'Delete Organization',
@@ -229,6 +239,7 @@ class _AdminScreenState extends State<AdminScreen> {
                                       },
                                     );
                                   },
+                                  tooltip: 'Delete',
                                 ),
                               ],
                             ),
@@ -249,7 +260,8 @@ class _AdminScreenState extends State<AdminScreen> {
           child: SingleChildScrollView(
             child: Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -345,6 +357,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () => setState(() {}),
+                      tooltip: 'Search',
                     )
                   ],
                 ),
@@ -362,7 +375,8 @@ class _AdminScreenState extends State<AdminScreen> {
                         child: ListTile(
                           title: Text(
                             user.username,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             'Email: ${user.email}\n'
@@ -375,23 +389,28 @@ class _AdminScreenState extends State<AdminScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.orange),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.orange),
                                   onPressed: () {
                                     _showEditUserDialog(user, adminProvider);
                                   },
+                                  tooltip: 'Edit',
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
                                   onPressed: () {
                                     _confirmDeletion(
                                       title: 'Delete User',
-                                      content: 'Delete "${user.username}"?',
+                                      content:
+                                      'Delete "${user.username}"?',
                                       onConfirm: () {
                                         adminProvider.deleteUser(user.id);
                                         Navigator.pop(context);
                                       },
                                     );
                                   },
+                                  tooltip: 'Delete',
                                 ),
                               ],
                             ),
@@ -405,14 +424,15 @@ class _AdminScreenState extends State<AdminScreen> {
             ),
           ),
         ),
-        // Add user form
+        // Right: add user form
         Container(
           width: 300,
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
             child: Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -450,7 +470,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
-                      decoration: const InputDecoration(labelText: 'Select Organization'),
+                      decoration:
+                      const InputDecoration(labelText: 'Select Organization'),
                       items: adminProvider.organizations
                           .map(
                             (org) => DropdownMenuItem<int>(
@@ -459,7 +480,10 @@ class _AdminScreenState extends State<AdminScreen> {
                         ),
                       )
                           .toList(),
-                      onChanged: (value) {},
+                      onChanged: (val) {
+                        // Handle organization selection if needed
+                      },
+                      hint: const Text('Choose Org'),
                     ),
                     const SizedBox(height: 12),
                     CustomButton(
@@ -481,13 +505,16 @@ class _AdminScreenState extends State<AdminScreen> {
                         if (adminProvider.organizations.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('No org available.'),
+                              content: Text('No organization available.'),
                               backgroundColor: Colors.red,
                             ),
                           );
                           return;
                         }
-                        final selectedOrg = adminProvider.organizations.first;
+                        final selectedOrg = adminProvider.organizations.firstWhere(
+                              (org) => org.id == (adminProvider.organizations.isNotEmpty ? org.id : 1),
+                          orElse: () => adminProvider.organizations.first,
+                        );
                         adminProvider.addUser(
                           username: _userNameController.text.trim(),
                           email: _userEmailController.text.trim(),
@@ -568,6 +595,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () => setState(() {}),
+                      tooltip: 'Search',
                     ),
                   ],
                 ),
@@ -585,8 +613,8 @@ class _AdminScreenState extends State<AdminScreen> {
                         child: ListTile(
                           title: Text(
                             '${t.name} (Code: ${t.code})',
-                            style:
-                            const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             'Grade: ${t.grade}\n'
@@ -613,13 +641,16 @@ class _AdminScreenState extends State<AdminScreen> {
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.orange),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.orange),
                                   onPressed: () {
                                     _showEditTestDialog(t, adminProvider);
                                   },
+                                  tooltip: 'Edit',
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
                                   onPressed: () {
                                     _confirmDeletion(
                                       title: 'Delete Test',
@@ -630,6 +661,7 @@ class _AdminScreenState extends State<AdminScreen> {
                                       },
                                     );
                                   },
+                                  tooltip: 'Delete',
                                 ),
                               ],
                             ),
@@ -643,14 +675,15 @@ class _AdminScreenState extends State<AdminScreen> {
             ),
           ),
         ),
-        // Add Test form
+        // Right: add test form
         Container(
           width: 300,
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
             child: Card(
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -686,7 +719,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
-                      decoration: const InputDecoration(labelText: 'Select Domain'),
+                      decoration:
+                      const InputDecoration(labelText: 'Select Domain'),
                       items: adminProvider.testDomains
                           .map(
                             (dom) => DropdownMenuItem<int>(
@@ -695,7 +729,10 @@ class _AdminScreenState extends State<AdminScreen> {
                         ),
                       )
                           .toList(),
-                      onChanged: (value) {},
+                      onChanged: (val) {
+                        // Handle domain selection if needed
+                      },
+                      hint: const Text('Choose Domain'),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -704,7 +741,9 @@ class _AdminScreenState extends State<AdminScreen> {
                         const Spacer(),
                         Switch(
                           value: true,
-                          onChanged: (val) {},
+                          onChanged: (val) {
+                            // Handle switch if needed
+                          },
                         ),
                       ],
                     ),
@@ -725,6 +764,15 @@ class _AdminScreenState extends State<AdminScreen> {
                           );
                           return;
                         }
+                        if (adminProvider.testDomains.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No domain available.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
                         adminProvider.addTest(
                           code: _testCodeController.text.trim(),
                           name: _testNameController.text.trim(),
@@ -733,9 +781,7 @@ class _AdminScreenState extends State<AdminScreen> {
                           duration:
                           int.parse(_testDurationController.text.trim()),
                           isActive: true,
-                          domainId: adminProvider.testDomains.isNotEmpty
-                              ? adminProvider.testDomains.first.id
-                              : 1,
+                          domainId: adminProvider.testDomains.first.id,
                         );
                         _testCodeController.clear();
                         _testNameController.clear();
@@ -771,11 +817,13 @@ class _AdminScreenState extends State<AdminScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title:
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           content: Text(content),
           actions: [
             TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: const Text('Cancel',
+                  style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.pop(ctx),
             ),
             ElevatedButton(
@@ -789,7 +837,7 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  void _showEditOrganizationDialog(org, adminProvider) {
+  void _showEditOrganizationDialog(org, AdminProvider adminProvider) {
     final TextEditingController _editNameController =
     TextEditingController(text: org.name);
     final TextEditingController _editDescController =
@@ -805,7 +853,8 @@ class _AdminScreenState extends State<AdminScreen> {
             child: Column(
               children: [
                 CustomTextField(
-                    label: 'Organization Name', controller: _editNameController),
+                    label: 'Organization Name',
+                    controller: _editNameController),
                 const SizedBox(height: 12),
                 CustomTextField(
                     label: 'Description', controller: _editDescController),
@@ -814,7 +863,8 @@ class _AdminScreenState extends State<AdminScreen> {
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: const Text('Cancel',
+                  style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.pop(ctx),
             ),
             ElevatedButton(
@@ -837,7 +887,8 @@ class _AdminScreenState extends State<AdminScreen> {
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Updated'), backgroundColor: Colors.green),
+                      content: Text('Organization updated'),
+                      backgroundColor: Colors.green),
                 );
               },
             )
@@ -847,95 +898,112 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  void _showEditUserDialog(user, adminProvider) {
+  void _showEditUserDialog(User user, AdminProvider adminProvider) {
     final _editNameController = TextEditingController(text: user.username);
     final _editEmailController = TextEditingController(text: user.email);
-    final _editPhoneController = TextEditingController(text: user.phoneNumber ?? '');
-    var selectedOrg = user.organization;
+    final _editPhoneController =
+    TextEditingController(text: user.phoneNumber ?? '');
+    int selectedOrgId = user.organization.id;
 
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Edit User',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                CustomTextField(label: 'Username', controller: _editNameController),
-                const SizedBox(height: 12),
-                CustomTextField(label: 'Email', controller: _editEmailController),
-                const SizedBox(height: 12),
-                CustomTextField(
-                    label: 'Phone Number', controller: _editPhoneController),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<int>(
-                  decoration: const InputDecoration(labelText: 'Select Organization'),
-                  value: selectedOrg.id,
-                  items: adminProvider.organizations
-                      .map(
-                        (o) => DropdownMenuItem<int>(
-                      value: o.id,
-                      child: Text(o.name),
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) {
+            return AlertDialog(
+              title: const Text('Edit User',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomTextField(
+                        label: 'Username', controller: _editNameController),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                        label: 'Email', controller: _editEmailController),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                        label: 'Phone Number',
+                        controller: _editPhoneController),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<int>(
+                      decoration:
+                      const InputDecoration(labelText: 'Select Organization'),
+                      value: selectedOrgId,
+                      items: adminProvider.organizations
+                          .map(
+                            (o) => DropdownMenuItem<int>(
+                          value: o.id,
+                          child: Text(o.name),
+                        ),
+                      )
+                          .toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setStateDialog(() {
+                            selectedOrgId = val;
+                          });
+                        }
+                      },
+                      hint: const Text('Choose Org'),
                     ),
-                  )
-                      .toList(),
-                  onChanged: (val) {
-                    selectedOrg = adminProvider.organizations.firstWhere(
-                          (x) => x.id == val,
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  child: const Text('Cancel',
+                      style: TextStyle(color: Colors.grey)),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+                ElevatedButton(
+                  child: const Text('Save'),
+                  onPressed: () {
+                    if (_editNameController.text.trim().isEmpty ||
+                        _editEmailController.text.trim().isEmpty ||
+                        _editPhoneController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Fill all fields'),
+                            backgroundColor: Colors.red),
+                      );
+                      return;
+                    }
+                    final selectedOrg = adminProvider.organizations.firstWhere(
+                          (o) => o.id == selectedOrgId,
                       orElse: () => user.organization,
                     );
+                    adminProvider.updateUser(
+                      id: user.id,
+                      username: _editNameController.text.trim(),
+                      email: _editEmailController.text.trim(),
+                      phoneNumber: _editPhoneController.text.trim(),
+                      roles: user.roles,
+                      organization: selectedOrg,
+                    );
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('User updated'),
+                          backgroundColor: Colors.green),
+                    );
                   },
-                ),
+                )
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-              onPressed: () => Navigator.pop(ctx),
-            ),
-            ElevatedButton(
-              child: const Text('Save'),
-              onPressed: () {
-                if (_editNameController.text.trim().isEmpty ||
-                    _editEmailController.text.trim().isEmpty ||
-                    _editPhoneController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Fill all fields'),
-                        backgroundColor: Colors.red),
-                  );
-                  return;
-                }
-                adminProvider.updateUser(
-                  id: user.id,
-                  username: _editNameController.text.trim(),
-                  email: _editEmailController.text.trim(),
-                  phoneNumber: _editPhoneController.text.trim(),
-                  roles: user.roles,
-                  organization: selectedOrg,
-                );
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('User updated'), backgroundColor: Colors.green),
-                );
-              },
-            )
-          ],
+            );
+          },
         );
       },
     );
   }
 
-  void _showEditTestDialog(test, adminProvider) {
+  void _showEditTestDialog(TestModel test, AdminProvider adminProvider) {
     final _editCodeController = TextEditingController(text: test.code);
     final _editNameController = TextEditingController(text: test.name);
     final _editGradeController = TextEditingController(text: test.grade);
     final _editDurationController =
     TextEditingController(text: test.duration.toString());
-    var selectedDomainId = test.domainId;
+    int selectedDomainId = test.domainId;
     bool isActive = test.isActive;
 
     showDialog(
@@ -949,11 +1017,14 @@ class _AdminScreenState extends State<AdminScreen> {
               content: SingleChildScrollView(
                 child: Column(
                   children: [
-                    CustomTextField(label: 'Test Code', controller: _editCodeController),
+                    CustomTextField(
+                        label: 'Test Code', controller: _editCodeController),
                     const SizedBox(height: 12),
-                    CustomTextField(label: 'Test Name', controller: _editNameController),
+                    CustomTextField(
+                        label: 'Test Name', controller: _editNameController),
                     const SizedBox(height: 12),
-                    CustomTextField(label: 'Grade', controller: _editGradeController),
+                    CustomTextField(
+                        label: 'Grade', controller: _editGradeController),
                     const SizedBox(height: 12),
                     CustomTextField(
                       label: 'Duration (minutes)',
@@ -962,7 +1033,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
-                      decoration: const InputDecoration(labelText: 'Select Domain'),
+                      decoration:
+                      const InputDecoration(labelText: 'Select Domain'),
                       value: selectedDomainId,
                       items: adminProvider.testDomains
                           .map(
@@ -973,10 +1045,13 @@ class _AdminScreenState extends State<AdminScreen> {
                       )
                           .toList(),
                       onChanged: (val) {
-                        setStateDialog(() {
-                          selectedDomainId = val ?? test.domainId;
-                        });
+                        if (val != null) {
+                          setStateDialog(() {
+                            selectedDomainId = val;
+                          });
+                        }
                       },
+                      hint: const Text('Choose Domain'),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -1016,11 +1091,21 @@ class _AdminScreenState extends State<AdminScreen> {
                       );
                       return;
                     }
+                    final parsedDuration =
+                    int.tryParse(_editDurationController.text.trim());
+                    if (parsedDuration == null || parsedDuration <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Invalid duration'),
+                            backgroundColor: Colors.red),
+                      );
+                      return;
+                    }
+
                     test.code = _editCodeController.text.trim();
                     test.name = _editNameController.text.trim();
                     test.grade = _editGradeController.text.trim();
-                    test.duration =
-                        int.tryParse(_editDurationController.text.trim()) ?? 0;
+                    test.duration = parsedDuration;
                     test.domainId = selectedDomainId;
                     test.isActive = isActive;
 

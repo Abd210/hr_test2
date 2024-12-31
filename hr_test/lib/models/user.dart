@@ -1,4 +1,4 @@
-//user.dart
+// lib/models/user.dart
 import 'role.dart';
 import 'organization.dart';
 
