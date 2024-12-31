@@ -1,3 +1,4 @@
+//admin_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // Remove the fl_chart imports you used specifically for the old dashboard if no longer needed

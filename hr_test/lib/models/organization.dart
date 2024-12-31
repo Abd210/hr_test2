@@ -1,3 +1,4 @@
+//organization.dart
 class Organization {
   final int id;
   String name;
