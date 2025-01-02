@@ -1,18 +1,20 @@
+// lib/models/test_question.dart
 
-//test_question.dart
+import 'package:hr_test/models/test_question_option.dart';
+
 enum QuestionType { easy, medium, hard }
 
 class TestQuestion {
   final int id;
   final int testId;
-  QuestionType type;
-  String content;
-  String? picture; // URL or base64
-  int order;
-  int answerTime; // in seconds
-  bool isActive;
-  bool isMandatory;
-  List<TestQuestionOption> options;
+  final QuestionType type;
+  final String content;
+  final String? picture;
+  final int order;
+  final int answerTime;
+  final bool isActive;
+  final bool isMandatory;
+  final List<TestQuestionOption> options;
 
   TestQuestion({
     required this.id,
@@ -25,21 +27,5 @@ class TestQuestion {
     required this.isActive,
     required this.isMandatory,
     required this.options,
-  });
-}
-
-class TestQuestionOption {
-  final int id;
-  final int questionId;
-  String content;
-  int order;
-  bool isCorrect;
-
-  TestQuestionOption({
-    required this.id,
-    required this.questionId,
-    required this.content,
-    required this.order,
-    required this.isCorrect,
   });
 }

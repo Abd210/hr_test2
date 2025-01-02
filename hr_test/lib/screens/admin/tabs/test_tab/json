@@ -1,0 +1,1161 @@
+[
+  {
+    "content": "What is the size of an `int` variable in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "16 bits", "isCorrect": false },
+      { "content": "32 bits", "isCorrect": true },
+      { "content": "64 bits", "isCorrect": false },
+      { "content": "8 bits", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which keyword is used to inherit a class in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "implement", "isCorrect": false },
+      { "content": "extends", "isCorrect": true },
+      { "content": "inherits", "isCorrect": false },
+      { "content": "super", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a primitive data type in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "int", "isCorrect": false },
+      { "content": "boolean", "isCorrect": false },
+      { "content": "String", "isCorrect": true },
+      { "content": "double", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the default value of a local variable in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "null", "isCorrect": false },
+      { "content": "0", "isCorrect": false },
+      { "content": "Depends on the data type", "isCorrect": false },
+      { "content": "No default value", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "Which method is called when an object is created in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "finalize()", "isCorrect": false },
+      { "content": "main()", "isCorrect": false },
+      { "content": "constructor", "isCorrect": true },
+      { "content": "init()", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is used to handle exceptions in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "try-catch block", "isCorrect": true },
+      { "content": "if-else statement", "isCorrect": false },
+      { "content": "switch-case block", "isCorrect": false },
+      { "content": "for loop", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nSystem.out.println(10 + 20 + \"30\");\n```",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "3030", "isCorrect": false },
+      { "content": "102030", "isCorrect": false },
+      { "content": "3030", "isCorrect": false },
+      { "content": "3030", "isCorrect": false },
+      { "content": "3030", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which interface does `ArrayList` implement?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "List", "isCorrect": true },
+      { "content": "Set", "isCorrect": false },
+      { "content": "Map", "isCorrect": false },
+      { "content": "Queue", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `final` keyword in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To mark a variable as constant", "isCorrect": true },
+      { "content": "To allow method overriding", "isCorrect": false },
+      { "content": "To make a class inheritable", "isCorrect": false },
+      { "content": "To initialize a variable", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid access modifier in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "public", "isCorrect": false },
+      { "content": "private", "isCorrect": false },
+      { "content": "protected", "isCorrect": false },
+      { "content": "package-private", "isCorrect": false },
+      { "content": "default-private", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the correct way to create an instance of `ArrayList`?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "ArrayList list = new ArrayList();", "isCorrect": true },
+      { "content": "ArrayList list = ArrayList();", "isCorrect": false },
+      { "content": "ArrayList list = new ArrayList;", "isCorrect": false },
+      { "content": "ArrayList list = ArrayList<>();", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is used to achieve abstraction in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Abstract class", "isCorrect": true },
+      { "content": "Interface", "isCorrect": true },
+      { "content": "Both abstract class and interface", "isCorrect": true },
+      { "content": "None of the above", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nint a = 5;\nint b = 2;\nSystem.out.println(a / b);\n```",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "2.5", "isCorrect": false },
+      { "content": "2", "isCorrect": true },
+      { "content": "3", "isCorrect": false },
+      { "content": "Error", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following statements is true about Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Java supports multiple inheritance through classes.", "isCorrect": false },
+      { "content": "Java supports multiple inheritance through interfaces.", "isCorrect": true },
+      { "content": "Java does not support inheritance.", "isCorrect": false },
+      { "content": "Java supports multiple inheritance through both classes and interfaces.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `static` keyword in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To indicate that a variable or method belongs to the class, rather than instances of the class.", "isCorrect": true },
+      { "content": "To make a class abstract.", "isCorrect": false },
+      { "content": "To prevent method overriding.", "isCorrect": false },
+      { "content": "To initialize a variable.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is a checked exception in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "ArithmeticException", "isCorrect": false },
+      { "content": "NullPointerException", "isCorrect": false },
+      { "content": "IOException", "isCorrect": true },
+      { "content": "ArrayIndexOutOfBoundsException", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the result of the following code?\n\n```java\nString s = \"Hello\" + \" \" + \"World\";\nSystem.out.println(s.length());\n```",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "10", "isCorrect": false },
+      { "content": "11", "isCorrect": true },
+      { "content": "12", "isCorrect": false },
+      { "content": "13", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which collection class in Java does not allow duplicate elements?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "ArrayList", "isCorrect": false },
+      { "content": "HashSet", "isCorrect": true },
+      { "content": "LinkedList", "isCorrect": false },
+      { "content": "Vector", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the default value of a boolean variable in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "true", "isCorrect": false },
+      { "content": "false", "isCorrect": true },
+      { "content": "null", "isCorrect": false },
+      { "content": "0", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following keywords is used to prevent a class from being subclassed?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "static", "isCorrect": false },
+      { "content": "final", "isCorrect": true },
+      { "content": "abstract", "isCorrect": false },
+      { "content": "private", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What does JVM stand for?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Java Variable Machine", "isCorrect": false },
+      { "content": "Java Virtual Machine", "isCorrect": true },
+      { "content": "Java Vendor Machine", "isCorrect": false },
+      { "content": "Java Vector Machine", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a feature of Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Object-oriented", "isCorrect": false },
+      { "content": "Platform-independent", "isCorrect": false },
+      { "content": "Pointer manipulation", "isCorrect": true },
+      { "content": "Multithreaded", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "How do you create an instance of an abstract class in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Using the `new` keyword directly.", "isCorrect": false },
+      { "content": "Through a subclass.", "isCorrect": true },
+      { "content": "Abstract classes cannot have instances.", "isCorrect": false },
+      { "content": "Using reflection.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which statement is true about interfaces in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Interfaces can have constructors.", "isCorrect": false },
+      { "content": "Interfaces can contain static methods.", "isCorrect": true },
+      { "content": "Interfaces can have instance variables.", "isCorrect": false },
+      { "content": "Interfaces can extend classes.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nint[] arr = {1, 2, 3, 4, 5};\nSystem.out.println(arr[5]);\n```",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "5", "isCorrect": false },
+      { "content": "6", "isCorrect": false },
+      { "content": "Runtime Exception (ArrayIndexOutOfBoundsException)", "isCorrect": true },
+      { "content": "Compile-time Error", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following methods is used to start a thread in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "run()", "isCorrect": false },
+      { "content": "start()", "isCorrect": true },
+      { "content": "execute()", "isCorrect": false },
+      { "content": "begin()", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nSystem.out.println(\"Java\" instanceof Object);\n```",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "true", "isCorrect": true },
+      { "content": "false", "isCorrect": false },
+      { "content": "Compilation Error", "isCorrect": false },
+      { "content": "Runtime Error", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is a marker interface in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Serializable", "isCorrect": true },
+      { "content": "Runnable", "isCorrect": false },
+      { "content": "Comparator", "isCorrect": false },
+      { "content": "Callable", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is method overloading in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Having multiple methods with the same name but different parameters.", "isCorrect": true },
+      { "content": "Having multiple methods with the same name and same parameters.", "isCorrect": false },
+      { "content": "Changing the return type of a method.", "isCorrect": false },
+      { "content": "None of the above.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which keyword is used to refer to the superclass in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "this", "isCorrect": false },
+      { "content": "super", "isCorrect": true },
+      { "content": "parent", "isCorrect": false },
+      { "content": "base", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the correct way to declare an array of integers in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "int arr[];", "isCorrect": true },
+      { "content": "int[] arr;", "isCorrect": true },
+      { "content": "Both a and b", "isCorrect": true },
+      { "content": "None of the above", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is used to terminate a loop prematurely?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "continue", "isCorrect": false },
+      { "content": "break", "isCorrect": true },
+      { "content": "return", "isCorrect": false },
+      { "content": "exit", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `hashCode()` method in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To provide a unique identifier for objects.", "isCorrect": true },
+      { "content": "To compare two objects for equality.", "isCorrect": false },
+      { "content": "To convert an object to a string.", "isCorrect": false },
+      { "content": "None of the above.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which exception is thrown when trying to access a null object in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "ArrayIndexOutOfBoundsException", "isCorrect": false },
+      { "content": "NullPointerException", "isCorrect": true },
+      { "content": "NumberFormatException", "isCorrect": false },
+      { "content": "IOException", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the use of the `volatile` keyword in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To make a variable accessible across multiple threads.", "isCorrect": true },
+      { "content": "To prevent a variable from being modified.", "isCorrect": false },
+      { "content": "To allow method overriding.", "isCorrect": false },
+      { "content": "To define a constant value.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid Java keyword?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "synchronized", "isCorrect": false },
+      { "content": "transient", "isCorrect": false },
+      { "content": "volatile", "isCorrect": false },
+      { "content": "unsigned", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "Which of the following is used to handle multiple exceptions in a single catch block?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Using multiple catch blocks.", "isCorrect": false },
+      { "content": "Using a single catch block with multiple exception types separated by '|'.", "isCorrect": true },
+      { "content": "Using nested try-catch blocks.", "isCorrect": false },
+      { "content": "Using the `throws` keyword.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the correct way to declare a generic class in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "class MyClass<T> {}", "isCorrect": true },
+      { "content": "class MyClass<T>;", "isCorrect": false },
+      { "content": "class MyClass[] {}", "isCorrect": false },
+      { "content": "class MyClass<>(T) {}", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid way to create a thread in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "By extending the `Thread` class.", "isCorrect": false },
+      { "content": "By implementing the `Runnable` interface.", "isCorrect": false },
+      { "content": "By implementing the `Callable` interface.", "isCorrect": false },
+      { "content": "By creating a new instance of `Object`.", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the use of the `super` keyword in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To refer to the current class instance.", "isCorrect": false },
+      { "content": "To refer to the superclass instance.", "isCorrect": true },
+      { "content": "To declare a superclass.", "isCorrect": false },
+      { "content": "To create a new instance of a superclass.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is true about Java constructors?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Constructors can have return types.", "isCorrect": false },
+      { "content": "Constructors can be abstract.", "isCorrect": false },
+      { "content": "Constructors are used to initialize objects.", "isCorrect": true },
+      { "content": "Constructors can be final.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `instanceof` operator in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To check if two objects are equal.", "isCorrect": false },
+      { "content": "To check if an object is an instance of a specific class or interface.", "isCorrect": true },
+      { "content": "To cast an object to a specific type.", "isCorrect": false },
+      { "content": "To compare the memory addresses of two objects.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which statement is true about the `String` class in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Strings are mutable.", "isCorrect": false },
+      { "content": "Strings are immutable.", "isCorrect": true },
+      { "content": "Strings can be modified after creation.", "isCorrect": false },
+      { "content": "None of the above.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `transient` keyword in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To indicate that a variable should not be serialized.", "isCorrect": true },
+      { "content": "To make a variable thread-safe.", "isCorrect": false },
+      { "content": "To make a variable constant.", "isCorrect": false },
+      { "content": "To indicate that a variable can be overridden.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid type of inner class in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Member inner class", "isCorrect": false },
+      { "content": "Static nested class", "isCorrect": false },
+      { "content": "Local inner class", "isCorrect": false },
+      { "content": "Protected inner class", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nString s1 = \"Hello\";\nString s2 = \"Hello\";\nSystem.out.println(s1 == s2);\n```",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "true", "isCorrect": true },
+      { "content": "false", "isCorrect": false },
+      { "content": "Compilation Error", "isCorrect": false },
+      { "content": "Runtime Error", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following best describes polymorphism in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "The ability of a variable to hold multiple types.", "isCorrect": false },
+      { "content": "The ability of a method to perform different tasks based on the object it is acting upon.", "isCorrect": true },
+      { "content": "The ability to hide the internal implementation of a class.", "isCorrect": false },
+      { "content": "The ability to create multiple constructors in a class.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the difference between `==` and `equals()` in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "`==` checks for value equality, while `equals()` checks for reference equality.", "isCorrect": false },
+      { "content": "`==` checks for reference equality, while `equals()` checks for value equality.", "isCorrect": true },
+      { "content": "`==` and `equals()` are the same.", "isCorrect": false },
+      { "content": "`==` can only be used with primitive types.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid way to create a thread in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Extending the `Thread` class.", "isCorrect": false },
+      { "content": "Implementing the `Runnable` interface.", "isCorrect": false },
+      { "content": "Implementing the `Callable` interface.", "isCorrect": false },
+      { "content": "Implementing the `Serializable` interface.", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `synchronized` keyword in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To make a method immutable.", "isCorrect": false },
+      { "content": "To prevent multiple threads from accessing a method or block simultaneously.", "isCorrect": true },
+      { "content": "To allow method overriding.", "isCorrect": false },
+      { "content": "To declare a variable as constant.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is true about the `HashMap` class in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "It allows duplicate keys.", "isCorrect": false },
+      { "content": "It allows one null key.", "isCorrect": true },
+      { "content": "It maintains the insertion order of elements.", "isCorrect": false },
+      { "content": "It is synchronized.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the result of the following code?\n\n```java\nString s = \"Java\";\ns += \" Programming\";\nSystem.out.println(s);\n```",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "JavaProgramming", "isCorrect": false },
+      { "content": "Java Programming", "isCorrect": true },
+      { "content": "Java Programing", "isCorrect": false },
+      { "content": "Java_Programming", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following statements is true about Java interfaces?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Interfaces can have constructors.", "isCorrect": false },
+      { "content": "Interfaces can contain default methods.", "isCorrect": true },
+      { "content": "Interfaces can have instance variables.", "isCorrect": false },
+      { "content": "Interfaces can extend classes.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nint a = 10;\nint b = 20;\nif(a > b) {\n    System.out.println(\"a is greater\");\n} else {\n    System.out.println(\"b is greater\");\n}\n```",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "a is greater", "isCorrect": false },
+      { "content": "b is greater", "isCorrect": true },
+      { "content": "No output", "isCorrect": false },
+      { "content": "Compilation Error", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid way to initialize an ArrayList in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "ArrayList<String> list = new ArrayList<>();", "isCorrect": false },
+      { "content": "List<String> list = new ArrayList<>();", "isCorrect": false },
+      { "content": "ArrayList list = new ArrayList<String>();", "isCorrect": false },
+      { "content": "ArrayList<String> list = new ArrayList<String>[10];", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nStringBuilder sb = new StringBuilder(\"Java\");\nsb.append(\" Programming\");\nSystem.out.println(sb);\n```",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "JavaProgramming", "isCorrect": false },
+      { "content": "Java Programming", "isCorrect": true },
+      { "content": "Java Programing", "isCorrect": false },
+      { "content": "Java_Programming", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following methods is used to remove all elements from a collection in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "clear()", "isCorrect": true },
+      { "content": "removeAll()", "isCorrect": false },
+      { "content": "delete()", "isCorrect": false },
+      { "content": "erase()", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What does the `abstract` keyword signify in a Java class?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "The class cannot be instantiated.", "isCorrect": true },
+      { "content": "The class can have no methods.", "isCorrect": false },
+      { "content": "The class must have at least one abstract method.", "isCorrect": false },
+      { "content": "The class cannot be extended.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following best describes encapsulation in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Inheritance of classes.", "isCorrect": false },
+      { "content": "Ability to hide the internal state of an object and require all interaction to be performed through an object's methods.", "isCorrect": true },
+      { "content": "Ability to have multiple forms.", "isCorrect": false },
+      { "content": "Creating methods with the same name but different parameters.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `toString()` method in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To convert a string to an object.", "isCorrect": false },
+      { "content": "To convert an object to its string representation.", "isCorrect": true },
+      { "content": "To compare two strings.", "isCorrect": false },
+      { "content": "To initialize a string.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following can be used to iterate over elements in a `HashSet`?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Iterator", "isCorrect": true },
+      { "content": "Enumeration", "isCorrect": false },
+      { "content": "ListIterator", "isCorrect": false },
+      { "content": "Both Iterator and Enumeration", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the result of `5 + 2 + \"3\"` in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "\"532\"", "isCorrect": false },
+      { "content": "\"73\"", "isCorrect": false },
+      { "content": "\"523\"", "isCorrect": true },
+      { "content": "\"10\"", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is a valid declaration of a generic method in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "public <T> void method(T t)", "isCorrect": true },
+      { "content": "public void <T> method(T t)", "isCorrect": false },
+      { "content": "public void method<T>(T t)", "isCorrect": false },
+      { "content": "public <T> void method(T t) throws Exception", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `implements` keyword in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To inherit a class.", "isCorrect": false },
+      { "content": "To implement an interface.", "isCorrect": true },
+      { "content": "To create a new class.", "isCorrect": false },
+      { "content": "To declare a package.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is used to inherit multiple interfaces in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Using multiple `extends` keywords.", "isCorrect": false },
+      { "content": "Using multiple `implements` keywords.", "isCorrect": false },
+      { "content": "Listing multiple interfaces separated by commas after `implements`.", "isCorrect": true },
+      { "content": "Java does not support multiple interfaces.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the scope of a `protected` member in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Within the same class only.", "isCorrect": false },
+      { "content": "Within the same package and subclasses.", "isCorrect": true },
+      { "content": "Anywhere in the application.", "isCorrect": false },
+      { "content": "Within subclasses only.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following statements is true about the `HashMap` class?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "It maintains the insertion order.", "isCorrect": false },
+      { "content": "It allows one null key and multiple null values.", "isCorrect": true },
+      { "content": "It is synchronized by default.", "isCorrect": false },
+      { "content": "It does not allow null keys or values.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the difference between `StringBuilder` and `StringBuffer` in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "`StringBuilder` is synchronized, while `StringBuffer` is not.", "isCorrect": false },
+      { "content": "`StringBuffer` is synchronized, while `StringBuilder` is not.", "isCorrect": true },
+      { "content": "`StringBuilder` is immutable, while `StringBuffer` is mutable.", "isCorrect": false },
+      { "content": "`StringBuffer` can be converted to `StringBuilder`.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid way to iterate over a collection in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Using an Iterator.", "isCorrect": false },
+      { "content": "Using a for-each loop.", "isCorrect": false },
+      { "content": "Using a while loop with enumeration.", "isCorrect": false },
+      { "content": "Using a do-while loop with the get() method.", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `finally` block in exception handling?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To execute code only if an exception is thrown.", "isCorrect": false },
+      { "content": "To execute code regardless of whether an exception is thrown or not.", "isCorrect": true },
+      { "content": "To catch multiple exceptions.", "isCorrect": false },
+      { "content": "To rethrow an exception.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following best describes the `String.intern()` method?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Converts a string to uppercase.", "isCorrect": false },
+      { "content": "Returns a canonical representation for the string object.", "isCorrect": true },
+      { "content": "Creates a new string object in memory.", "isCorrect": false },
+      { "content": "Removes all whitespace from the string.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nString s1 = \"Java\";\nString s2 = new String(\"Java\");\nSystem.out.println(s1.equals(s2));\nSystem.out.println(s1 == s2);\n```",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "true true", "isCorrect": false },
+      { "content": "false false", "isCorrect": false },
+      { "content": "true false", "isCorrect": true },
+      { "content": "false true", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid statement about Java streams?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Streams can be infinite.", "isCorrect": false },
+      { "content": "Streams can be parallel.", "isCorrect": false },
+      { "content": "Streams store elements in memory.", "isCorrect": true },
+      { "content": "Streams support functional-style operations.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which statement is true about Java's garbage collection?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Garbage collection is manually invoked by the programmer.", "isCorrect": false },
+      { "content": "Garbage collection automatically reclaims memory by removing objects that are no longer reachable.", "isCorrect": true },
+      { "content": "Java does not have garbage collection.", "isCorrect": false },
+      { "content": "Garbage collection only works for primitive types.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the difference between `throw` and `throws` in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "`throw` is used to declare exceptions, while `throws` is used to throw an exception.", "isCorrect": false },
+      { "content": "`throw` is used to throw an exception, while `throws` is used to declare exceptions.", "isCorrect": true },
+      { "content": "`throw` and `throws` are interchangeable.", "isCorrect": false },
+      { "content": "`throw` is used only for runtime exceptions, while `throws` is used for checked exceptions.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is true about enums in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Enums can extend other classes.", "isCorrect": false },
+      { "content": "Enums implicitly extend `java.lang.Enum`.", "isCorrect": true },
+      { "content": "Enums can have abstract methods.", "isCorrect": false },
+      { "content": "Enums cannot have constructors.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nint x = 10;\nint y = 20;\nint z = x > y ? x : y;\nSystem.out.println(z);\n```",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "10", "isCorrect": false },
+      { "content": "20", "isCorrect": true },
+      { "content": "30", "isCorrect": false },
+      { "content": "Compilation Error", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid way to create a thread in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Extending the `Thread` class.", "isCorrect": false },
+      { "content": "Implementing the `Runnable` interface.", "isCorrect": false },
+      { "content": "Implementing the `Callable` interface.", "isCorrect": false },
+      { "content": "Implementing the `Serializable` interface.", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `assert` keyword in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To make a variable final.", "isCorrect": false },
+      { "content": "To declare a constant value.", "isCorrect": false },
+      { "content": "To perform debugging checks during development.", "isCorrect": true },
+      { "content": "To handle exceptions.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid type of polymorphism in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Compile-time polymorphism", "isCorrect": false },
+      { "content": "Runtime polymorphism", "isCorrect": false },
+      { "content": "Dynamic polymorphism", "isCorrect": false },
+      { "content": "Static polymorphism", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "Which statement about constructors is false?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Constructors have the same name as the class.", "isCorrect": false },
+      { "content": "Constructors do not have a return type.", "isCorrect": false },
+      { "content": "Constructors can be overloaded.", "isCorrect": false },
+      { "content": "Constructors can be inherited.", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "What is the purpose of the `instanceof` operator in Java?",
+    "type": "Medium",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "To check if two objects are equal.", "isCorrect": false },
+      { "content": "To check if an object is an instance of a specific class or interface.", "isCorrect": true },
+      { "content": "To cast an object to a specific type.", "isCorrect": false },
+      { "content": "To compare the memory addresses of two objects.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid access modifier in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "public", "isCorrect": false },
+      { "content": "private", "isCorrect": false },
+      { "content": "protected", "isCorrect": false },
+      { "content": "internal", "isCorrect": true }
+    ]
+  },
+  {
+    "content": "Which of the following best describes the `finalize()` method in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "It's called when an object is garbage collected.", "isCorrect": true },
+      { "content": "It's used to finalize the initialization of an object.", "isCorrect": false },
+      { "content": "It's a constructor method.", "isCorrect": false },
+      { "content": "It's used to reset object fields.", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What will be the output of the following code?\n\n```java\npublic class Test {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\".concat(\" World\"));\n    }\n}\n```",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "HelloWorld", "isCorrect": false },
+      { "content": "Hello World", "isCorrect": true },
+      { "content": "Hello", "isCorrect": false },
+      { "content": "World", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is not a valid keyword in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "static", "isCorrect": false },
+      { "content": "Boolean", "isCorrect": true },
+      { "content": "synchronized", "isCorrect": false },
+      { "content": "volatile", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the default value of a reference variable in Java?",
+    "type": "Easy",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "0", "isCorrect": false },
+      { "content": "false", "isCorrect": false },
+      { "content": "null", "isCorrect": true },
+      { "content": "Depends on the data type", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "Which of the following is used to implement a callback mechanism in Java?",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "Abstract classes", "isCorrect": false },
+      { "content": "Interfaces", "isCorrect": true },
+      { "content": "Enums", "isCorrect": false },
+      { "content": "Final classes", "isCorrect": false }
+    ]
+  },
+  {
+    "content": "What is the output of the following code?\n\n```java\nint a = 5;\nint b = ++a * 5 / a--;\nSystem.out.println(a);\nSystem.out.println(b);\n```",
+    "type": "Hard",
+    "answerTime": 30,
+    "isActive": true,
+    "isMandatory": true,
+    "options": [
+      { "content": "4\n25", "isCorrect": false },
+      { "content": "5\n25", "isCorrect": false },
+      { "content": "5\n24", "isCorrect": true },
+      { "content": "6\n30", "isCorrect": false }
+    ]
+  }
+]

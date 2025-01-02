@@ -121,8 +121,7 @@ class _PersistentNavbarState extends State<PersistentNavbar>
             onTap: () {
               // Implement logout functionality here
               // For example:
-              // Provider.of<AuthProvider>(context, listen: false).logout();
-              // Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pushReplacementNamed(context, '/login');
             },
             child: _NavItem(
               data: _NavItemData(icon: Icons.exit_to_app, label: 'Logout'),
@@ -200,18 +199,12 @@ class _NavItem extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           // Animated label
-          FadeTransition(
-            opacity: labelAnimation,
-            child: ScaleTransition(
-              scale: labelAnimation,
-              child: Text(
-                data.label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 16,
-                ),
-              ),
+          Text(
+            data.label,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 16,
             ),
           ),
         ],

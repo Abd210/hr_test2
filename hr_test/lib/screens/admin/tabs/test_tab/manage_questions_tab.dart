@@ -1,28 +1,29 @@
-// lib/screens/manage_questions_widget.dart
+// lib/screens/admin/tabs/manage_question_tab.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/admin_provider.dart';
-import '../models/test_model.dart';
-import '../models/test_question.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/custom_text_field.dart';
+import '../../../../models/test_question_option.dart';
+import '../../../../providers/admin_provider.dart';
+import '../../../../models/test_model.dart';
+import '../../../../models/test_question.dart';
+import '../../../../widgets/custom_button.dart';
+import '../../../../widgets/custom_text_field.dart';
 
-class ManageQuestionsWidget extends StatefulWidget {
+class ManageQuestionTab extends StatefulWidget {
   final TestModel test;
   final VoidCallback onBack;
 
-  const ManageQuestionsWidget({
+  const ManageQuestionTab({
     Key? key,
     required this.test,
     required this.onBack,
   }) : super(key: key);
 
   @override
-  State<ManageQuestionsWidget> createState() => _ManageQuestionsWidgetState();
+  State<ManageQuestionTab> createState() => _ManageQuestionTabState();
 }
 
-class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
+class _ManageQuestionTabState extends State<ManageQuestionTab> {
   final _formKey = GlobalKey<FormState>();
 
   // Add Question form controllers
@@ -60,6 +61,7 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select at least one correct option.'),
+            backgroundColor: Colors.red,
           ),
         );
         return;
@@ -81,10 +83,7 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
           type = QuestionType.easy;
       }
 
-      final existingQuestions = adminProvider.testQuestions;
-      final newQuestionId = existingQuestions.isNotEmpty
-          ? existingQuestions.map((q) => q.id).reduce((a, b) => a > b ? a : b) + 1
-          : 1;
+      final newQuestionId = adminProvider.getNextQuestionId();
 
       final newQuestion = TestQuestion(
         id: newQuestionId,
@@ -92,34 +91,34 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
         type: type,
         content: questionContent,
         picture: null,
-        order: existingQuestions.length + 1,
+        order: adminProvider.getQuestionsByTestId(widget.test.id).length + 1,
         answerTime: 30,
         isActive: true,
         isMandatory: true,
         options: [
           TestQuestionOption(
-            id: 1,
+            id: adminProvider.getNextOptionId(),
             questionId: newQuestionId,
             content: option1,
             order: 1,
             isCorrect: _correctOptions.contains(1),
           ),
           TestQuestionOption(
-            id: 2,
+            id: adminProvider.getNextOptionId(),
             questionId: newQuestionId,
             content: option2,
             order: 2,
             isCorrect: _correctOptions.contains(2),
           ),
           TestQuestionOption(
-            id: 3,
+            id: adminProvider.getNextOptionId(),
             questionId: newQuestionId,
             content: option3,
             order: 3,
             isCorrect: _correctOptions.contains(3),
           ),
           TestQuestionOption(
-            id: 4,
+            id: adminProvider.getNextOptionId(),
             questionId: newQuestionId,
             content: option4,
             order: 4,
@@ -156,15 +155,19 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
     // We’ll use a separate form key for the dialog
     final GlobalKey<FormState> _editFormKey = GlobalKey<FormState>();
 
-    final _editQuestionController = TextEditingController(text: question.content);
-    final _editOption1Controller = TextEditingController(text: question.options[0].content);
-    final _editOption2Controller = TextEditingController(text: question.options[1].content);
-    final _editOption3Controller = TextEditingController(text: question.options[2].content);
-    final _editOption4Controller = TextEditingController(text: question.options[3].content);
+    final TextEditingController _editQuestionController =
+    TextEditingController(text: question.content);
+    final TextEditingController _editOption1Controller =
+    TextEditingController(text: question.options[0].content);
+    final TextEditingController _editOption2Controller =
+    TextEditingController(text: question.options[1].content);
+    final TextEditingController _editOption3Controller =
+    TextEditingController(text: question.options[2].content);
+    final TextEditingController _editOption4Controller =
+    TextEditingController(text: question.options[3].content);
 
     // Convert the question’s existing difficulty to a string:
     String _editSelectedDifficulty = question.type.toString().split('.').last;
-    // e.g. 'easy' -> 'Easy', etc. We can just set to 'Easy'/'Medium'/'Hard' below
 
     // Mark correct options
     final List<int> _editCorrectOptions = [];
@@ -202,55 +205,75 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                         label: 'Question Content',
                         controller: _editQuestionController,
                         validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Please enter a question' : null,
+                        (value == null || value.isEmpty)
+                            ? 'Please enter a question'
+                            : null,
+                        hintText: 'Enter question content',
+                        maxLines: 3,
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: 'Difficulty'),
+                        decoration:
+                        const InputDecoration(labelText: 'Difficulty'),
                         value: _editSelectedDifficulty,
-                        items: ['Easy', 'Medium', 'Hard']
-                            .map(
-                              (level) => DropdownMenuItem<String>(
+                        items: ['Easy', 'Medium', 'Hard'].map((level) {
+                          return DropdownMenuItem<String>(
                             value: level,
                             child: Text(level),
-                          ),
-                        )
-                            .toList(),
+                          );
+                        }).toList(),
                         onChanged: (value) {
                           setStateDialog(() {
                             _editSelectedDifficulty = value ?? 'Easy';
                           });
                         },
-                        validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Please select difficulty' : null,
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Please select difficulty'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       CustomTextField(
                         label: 'Option 1',
                         controller: _editOption1Controller,
                         validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Please enter option 1' : null,
+                        (value == null || value.isEmpty)
+                            ? 'Please enter option 1'
+                            : null,
+                        hintText: 'Enter option 1',
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 16),
                       CustomTextField(
                         label: 'Option 2',
                         controller: _editOption2Controller,
                         validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Please enter option 2' : null,
+                        (value == null || value.isEmpty)
+                            ? 'Please enter option 2'
+                            : null,
+                        hintText: 'Enter option 2',
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 16),
                       CustomTextField(
                         label: 'Option 3',
                         controller: _editOption3Controller,
                         validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Please enter option 3' : null,
+                        (value == null || value.isEmpty)
+                            ? 'Please enter option 3'
+                            : null,
+                        hintText: 'Enter option 3',
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 16),
                       CustomTextField(
                         label: 'Option 4',
                         controller: _editOption4Controller,
                         validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Please enter option 4' : null,
+                        (value == null || value.isEmpty)
+                            ? 'Please enter option 4'
+                            : null,
+                        hintText: 'Enter option 4',
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 16),
                       const Text(
@@ -262,7 +285,8 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                         children: List<Widget>.generate(4, (index) {
                           return FilterChip(
                             label: Text('Option ${index + 1}'),
-                            selected: _editCorrectOptions.contains(index + 1),
+                            selected:
+                            _editCorrectOptions.contains(index + 1),
                             onSelected: (bool selected) {
                               setStateDialog(() {
                                 if (selected) {
@@ -281,12 +305,14 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
               ),
               actions: [
                 TextButton(
-                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                  child: const Text('Cancel',
+                      style: TextStyle(color: Colors.grey)),
                   onPressed: () => Navigator.pop(dialogContext),
                 ),
                 ElevatedButton(
                   child: const Text('Save'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue),
                   onPressed: () {
                     final formState = _editFormKey.currentState;
                     if (formState == null || !formState.validate()) {
@@ -295,7 +321,8 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                     if (_editCorrectOptions.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Please select at least one correct option.'),
+                          content: Text(
+                              'Please select at least one correct option.'),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -322,28 +349,28 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                       isMandatory: question.isMandatory,
                       options: [
                         TestQuestionOption(
-                          id: 1,
+                          id: question.options[0].id,
                           questionId: question.id,
                           content: _editOption1Controller.text.trim(),
                           order: 1,
                           isCorrect: _editCorrectOptions.contains(1),
                         ),
                         TestQuestionOption(
-                          id: 2,
+                          id: question.options[1].id,
                           questionId: question.id,
                           content: _editOption2Controller.text.trim(),
                           order: 2,
                           isCorrect: _editCorrectOptions.contains(2),
                         ),
                         TestQuestionOption(
-                          id: 3,
+                          id: question.options[2].id,
                           questionId: question.id,
                           content: _editOption3Controller.text.trim(),
                           order: 3,
                           isCorrect: _editCorrectOptions.contains(3),
                         ),
                         TestQuestionOption(
-                          id: 4,
+                          id: question.options[3].id,
                           questionId: question.id,
                           content: _editOption4Controller.text.trim(),
                           order: 4,
@@ -383,11 +410,13 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title:
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           content: Text(content),
           actions: [
             TextButton(
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: const Text('Cancel',
+                  style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.pop(ctx),
             ),
             ElevatedButton(
@@ -463,7 +492,8 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Q${question.order}: ${question.content}',
@@ -474,7 +504,8 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                               ),
                               const SizedBox(height: 8),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: question.options.map((option) {
                                   return Row(
                                     children: [
@@ -482,8 +513,9 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                                         option.isCorrect
                                             ? Icons.check_circle
                                             : Icons.circle_outlined,
-                                        color:
-                                        option.isCorrect ? Colors.green : Colors.grey,
+                                        color: option.isCorrect
+                                            ? Colors.green
+                                            : Colors.grey,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 8),
@@ -494,14 +526,16 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                               ),
                               const SizedBox(height: 16),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment:
+                                MainAxisAlignment.end,
                                 children: [
                                   CustomButton(
                                     text: 'Edit',
                                     icon: Icons.edit,
                                     color: Colors.orange,
                                     onPressed: () {
-                                      _editQuestionDialog(question, adminProvider);
+                                      _editQuestionDialog(
+                                          question, adminProvider);
                                     },
                                     width: 100,
                                   ),
@@ -516,12 +550,17 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
                                         'Delete Question',
                                         'Are you sure you want to delete this question?',
                                             () {
-                                          adminProvider.deleteTestQuestion(question.id);
+                                          adminProvider
+                                              .deleteTestQuestion(
+                                              question.id);
                                           Navigator.pop(context);
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             const SnackBar(
-                                              content: Text('Question deleted'),
-                                              backgroundColor: Colors.green,
+                                              content: Text(
+                                                  'Question deleted'),
+                                              backgroundColor:
+                                              Colors.green,
                                             ),
                                           );
                                         },
@@ -542,118 +581,139 @@ class _ManageQuestionsWidgetState extends State<ManageQuestionsWidget> {
               const SizedBox(width: 16),
 
               // Add Question form (with smaller spacing)
-              Container(
-                width: 330,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).canvasColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Add Question',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        CustomTextField(
-                          label: 'Question Content',
-                          controller: _questionController,
-                          validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Please enter question' : null,
-                          verticalPadding: 10,
-                          horizontalPadding: 12,
-                        ),
-                        const SizedBox(height: 12),
-                        DropdownButtonFormField<String>(
-                          decoration: const InputDecoration(labelText: 'Difficulty'),
-                          value: _selectedDifficulty,
-                          items: ['Easy', 'Medium', 'Hard'].map((level) {
-                            return DropdownMenuItem<String>(
-                              value: level,
-                              child: Text(level),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedDifficulty = value ?? 'Easy';
-                            });
-                          },
-                          validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Please select difficulty' : null,
-                        ),
-                        const SizedBox(height: 12),
-                        CustomTextField(
-                          label: 'Option 1',
-                          controller: _option1Controller,
-                          validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Enter option 1' : null,
-                          verticalPadding: 10,
-                          horizontalPadding: 12,
-                        ),
-                        const SizedBox(height: 12),
-                        CustomTextField(
-                          label: 'Option 2',
-                          controller: _option2Controller,
-                          validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Enter option 2' : null,
-                          verticalPadding: 10,
-                          horizontalPadding: 12,
-                        ),
-                        const SizedBox(height: 12),
-                        CustomTextField(
-                          label: 'Option 3',
-                          controller: _option3Controller,
-                          validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Enter option 3' : null,
-                          verticalPadding: 10,
-                          horizontalPadding: 12,
-                        ),
-                        const SizedBox(height: 12),
-                        CustomTextField(
-                          label: 'Option 4',
-                          controller: _option4Controller,
-                          validator: (value) =>
-                          (value == null || value.isEmpty) ? 'Enter option 4' : null,
-                          verticalPadding: 10,
-                          horizontalPadding: 12,
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Select Correct Option(s)',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 10.0,
-                          children: List<Widget>.generate(4, (index) {
-                            return FilterChip(
-                              label: Text('Option ${index + 1}'),
-                              selected: _correctOptions.contains(index + 1),
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  if (selected) {
-                                    _correctOptions.add(index + 1);
-                                  } else {
-                                    _correctOptions.remove(index + 1);
-                                  }
-                                });
-                              },
-                            );
-                          }),
-                        ),
-                        const SizedBox(height: 12),
-                        CustomButton(
-                          text: 'Add Question',
-                          icon: Icons.add_task,
-                          onPressed: () => _addQuestion(adminProvider),
-                        ),
-                      ],
+              Expanded(
+                flex: 1,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).canvasColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.stretch,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Add Question',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Question Content',
+                            controller: _questionController,
+                            validator: (value) =>
+                            (value == null || value.isEmpty)
+                                ? 'Please enter question'
+                                : null,
+                            hintText: 'Enter question content',
+                            maxLines: 3,
+                          ),
+                          const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            decoration:
+                            const InputDecoration(labelText: 'Difficulty'),
+                            value: _selectedDifficulty,
+                            items: ['Easy', 'Medium', 'Hard'].map((level) {
+                              return DropdownMenuItem<String>(
+                                value: level,
+                                child: Text(level),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDifficulty =
+                                    value ?? 'Easy';
+                              });
+                            },
+                            validator: (value) =>
+                            (value == null || value.isEmpty)
+                                ? 'Please select difficulty'
+                                : null,
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Option 1',
+                            controller: _option1Controller,
+                            validator: (value) =>
+                            (value == null || value.isEmpty)
+                                ? 'Enter option 1'
+                                : null,
+                            hintText: 'Enter option 1',
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Option 2',
+                            controller: _option2Controller,
+                            validator: (value) =>
+                            (value == null || value.isEmpty)
+                                ? 'Enter option 2'
+                                : null,
+                            hintText: 'Enter option 2',
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Option 3',
+                            controller: _option3Controller,
+                            validator: (value) =>
+                            (value == null || value.isEmpty)
+                                ? 'Enter option 3'
+                                : null,
+                            hintText: 'Enter option 3',
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 12),
+                          CustomTextField(
+                            label: 'Option 4',
+                            controller: _option4Controller,
+                            validator: (value) =>
+                            (value == null || value.isEmpty)
+                                ? 'Enter option 4'
+                                : null,
+                            hintText: 'Enter option 4',
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Select Correct Option(s)',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Wrap(
+                            spacing: 10.0,
+                            children: List<Widget>.generate(4, (index) {
+                              return FilterChip(
+                                label: Text('Option ${index + 1}'),
+                                selected: _correctOptions
+                                    .contains(index + 1),
+                                onSelected: (bool selected) {
+                                  setState(() {
+                                    if (selected) {
+                                      _correctOptions
+                                          .add(index + 1);
+                                    } else {
+                                      _correctOptions
+                                          .remove(index + 1);
+                                    }
+                                  });
+                                },
+                              );
+                            }),
+                          ),
+                          const SizedBox(height: 12),
+                          CustomButton(
+                            text: 'Add Question',
+                            icon: Icons.add_task,
+                            onPressed: () => _addQuestion(adminProvider),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

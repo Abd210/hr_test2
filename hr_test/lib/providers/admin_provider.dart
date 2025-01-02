@@ -2,11 +2,13 @@
 
 import 'package:flutter/material.dart';
 import '../models/organization.dart';
+import '../models/test_question_option.dart';
 import '../models/user.dart';
 import '../models/test_model.dart';
 import '../models/test_domain.dart';
 import '../models/test_question.dart';
 import '../models/role.dart';
+import '../models/permission.dart';
 
 class AdminProvider with ChangeNotifier {
   // Organizations
@@ -24,7 +26,7 @@ class AdminProvider with ChangeNotifier {
 
   void addOrganization(String name, String description) {
     final newOrg = Organization(
-      id: _organizations.length + 1,
+      id: generateOrganizationId(),
       name: name,
       description: description,
       createdAt: DateTime.now(),
@@ -63,7 +65,7 @@ class AdminProvider with ChangeNotifier {
     required Organization organization,
   }) {
     final newUser = User(
-      id: _users.length + 1,
+      id: generateUserId(),
       username: username,
       email: email,
       password: password,
@@ -155,7 +157,7 @@ class AdminProvider with ChangeNotifier {
     required int domainId,
   }) {
     final newTest = TestModel(
-      id: _tests.length + 1,
+      id: generateTestId(),
       code: code,
       name: name,
       grade: grade,
@@ -179,6 +181,8 @@ class AdminProvider with ChangeNotifier {
 
   void deleteTest(int id) {
     _tests.removeWhere((test) => test.id == id);
+    // Also remove associated questions
+    _testQuestions.removeWhere((q) => q.testId == id);
     notifyListeners();
   }
 
@@ -232,6 +236,7 @@ class AdminProvider with ChangeNotifier {
 
   void addTestQuestion(TestQuestion question) {
     _testQuestions.add(question);
+    // Since options are part of the question, no need to add them separately
     notifyListeners();
   }
 
@@ -251,5 +256,57 @@ class AdminProvider with ChangeNotifier {
 
   List<TestQuestion> getQuestionsByTestId(int testId) {
     return _testQuestions.where((q) => q.testId == testId).toList();
+  }
+
+  // --------------------------------------------------------------------------
+  // Unique ID Generators
+  // --------------------------------------------------------------------------
+
+  int generateOrganizationId() {
+    if (_organizations.isEmpty) return 1;
+    return _organizations.map((org) => org.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  int generateUserId() {
+    if (_users.isEmpty) return 1;
+    return _users.map((user) => user.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  int generateTestId() {
+    if (_tests.isEmpty) return 1;
+    return _tests.map((test) => test.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  int getNextQuestionId() {
+    if (_testQuestions.isEmpty) return 1;
+    return _testQuestions.map((q) => q.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
+
+  int getNextOptionId() {
+    // Find the maximum option ID across all questions
+    int maxId = 0;
+    for (var question in _testQuestions) {
+      for (var option in question.options) {
+        if (option.id > maxId) {
+          maxId = option.id;
+        }
+      }
+    }
+    return maxId + 1;
+  }
+
+  // --------------------------------------------------------------------------
+  // Add Test with Questions via JSON
+  // --------------------------------------------------------------------------
+  Future<void> addTestWithQuestions(TestModel test, List<TestQuestion> questions) async {
+    // Add Test
+    _tests.add(test);
+
+    // Add Questions
+    for (var question in questions) {
+      _testQuestions.add(question);
+    }
+
+    notifyListeners();
   }
 }

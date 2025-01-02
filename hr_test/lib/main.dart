@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/admin_provider.dart';
 import 'screens/login_screen.dart';
-import 'screens/admin_screen.dart';
+import 'screens/admin/admin_screen.dart';
 import 'utils/theme.dart';
 
 void main() {

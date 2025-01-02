@@ -6,7 +6,7 @@ class TestModel {
   String name;
   String grade;
   DateTime date;
-  int duration; // in minutes
+  int duration;
   bool isActive;
   DateTime createdAt;
   int domainId;

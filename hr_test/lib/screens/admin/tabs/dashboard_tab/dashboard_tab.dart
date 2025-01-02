@@ -1,8 +1,8 @@
-// dashboard_screen.dart
+// dashboard_tab.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../widgets/custom_button.dart';
-import '../utils/theme.dart';
+import '../../../../widgets/custom_button.dart';
+import '../../../../utils/theme.dart';
 import 'dart:math' as math;
 
 class DashboardScreen extends StatefulWidget {
