@@ -1,17 +1,22 @@
 // lib/providers/admin_provider.dart
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/organization.dart';
-import '../models/test_question_option.dart';
-import '../models/user.dart';
 import '../models/test_model.dart';
 import '../models/test_domain.dart';
-import '../models/test_question.dart';
+import '../models/user.dart';
 import '../models/role.dart';
 import '../models/permission.dart';
+import '../models/test_question.dart';
+import '../test_questions/java_test_questions.dart';
+import '../test_questions/math_test_questions.dart';
+import '../utils/id_generator.dart';
 
 class AdminProvider with ChangeNotifier {
+  // ---------------------------
   // Organizations
+  // ---------------------------
   List<Organization> _organizations = [
     Organization(
       id: 1,
@@ -49,7 +54,9 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------------------------
   // Users
+  // ---------------------------
   List<User> _users = [
     // Initialize with some users if needed
   ];
@@ -102,7 +109,9 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------------------------
   // Test Domains
+  // ---------------------------
   List<TestDomain> _testDomains = [
     TestDomain(
       id: 1,
@@ -140,9 +149,34 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------------------------
   // Tests
+  // ---------------------------
   List<TestModel> _tests = [
-    // Initialize with some tests if needed
+    // Adding static tests "Java" and "Math" with comprehensive questions
+    TestModel(
+      id: 1,
+      code: 'JAVA',
+      name: 'Java Programming Test',
+      grade: 'A',
+      date: DateTime.now(),
+      duration: 60,
+      isActive: true,
+      createdAt: DateTime.now(),
+      domainId: 1, // Assuming 'Software Engineering'
+    ),
+    TestModel(
+      id: 2,
+      code: 'MATH',
+      name: 'Mathematics Test',
+      grade: 'B',
+      date: DateTime.now(),
+      duration: 45,
+      isActive: true,
+      createdAt: DateTime.now(),
+      domainId: 1, // Assuming 'Software Engineering'
+    ),
+    // Add more tests as needed
   ];
 
   List<TestModel> get tests => _tests;
@@ -186,50 +220,13 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------------------------
   // Test Questions
+  // ---------------------------
   List<TestQuestion> _testQuestions = [
-    TestQuestion(
-      id: 1,
-      testId: 1,
-      type: QuestionType.easy,
-      content: 'What is Java?',
-      picture: null,
-      order: 1,
-      answerTime: 30,
-      isActive: true,
-      isMandatory: true,
-      options: [
-        TestQuestionOption(
-          id: 1,
-          questionId: 1,
-          content: 'A programming language',
-          order: 1,
-          isCorrect: true,
-        ),
-        TestQuestionOption(
-          id: 2,
-          questionId: 1,
-          content: 'A coffee brand',
-          order: 2,
-          isCorrect: false,
-        ),
-        TestQuestionOption(
-          id: 3,
-          questionId: 1,
-          content: 'An island in Indonesia',
-          order: 3,
-          isCorrect: false,
-        ),
-        TestQuestionOption(
-          id: 4,
-          questionId: 1,
-          content: 'A type of dance',
-          order: 4,
-          isCorrect: false,
-        ),
-      ],
-    ),
-    // Add more questions as needed
+    // Import and add questions from separate files
+    ...javaTestQuestions,
+    ...mathTestQuestions,
   ];
 
   List<TestQuestion> get testQuestions => _testQuestions;
@@ -258,10 +255,9 @@ class AdminProvider with ChangeNotifier {
     return _testQuestions.where((q) => q.testId == testId).toList();
   }
 
-  // --------------------------------------------------------------------------
+  // ---------------------------
   // Unique ID Generators
-  // --------------------------------------------------------------------------
-
+  // ---------------------------
   int generateOrganizationId() {
     if (_organizations.isEmpty) return 1;
     return _organizations.map((org) => org.id).reduce((a, b) => a > b ? a : b) + 1;
@@ -277,6 +273,7 @@ class AdminProvider with ChangeNotifier {
     return _tests.map((test) => test.id).reduce((a, b) => a > b ? a : b) + 1;
   }
 
+  // These methods ensure unique IDs by scanning existing questions and options
   int getNextQuestionId() {
     if (_testQuestions.isEmpty) return 1;
     return _testQuestions.map((q) => q.id).reduce((a, b) => a > b ? a : b) + 1;
@@ -295,9 +292,9 @@ class AdminProvider with ChangeNotifier {
     return maxId + 1;
   }
 
-  // --------------------------------------------------------------------------
+  // ---------------------------
   // Add Test with Questions via JSON
-  // --------------------------------------------------------------------------
+  // ---------------------------
   Future<void> addTestWithQuestions(TestModel test, List<TestQuestion> questions) async {
     // Add Test
     _tests.add(test);
@@ -309,4 +306,49 @@ class AdminProvider with ChangeNotifier {
 
     notifyListeners();
   }
+
+  // ---------------------------
+  // Generate Test Key Methods
+  // ---------------------------
+
+  final Map<String, List<TestQuestion>> _testKeys = {};
+
+  /// Generates a unique test key for a given test ID.
+  /// Selects 10 MCQs: 4 Easy, 3 Medium, 3 Hard.
+  /// Throws an exception if insufficient questions are available.
+  String generateTestKey(int testId) {
+    final testQuestions = getQuestionsByTestId(testId);
+    final easy = testQuestions.where((q) => q.type == QuestionType.easy).toList();
+    final medium = testQuestions.where((q) => q.type == QuestionType.medium).toList();
+    final hard = testQuestions.where((q) => q.type == QuestionType.hard).toList();
+
+    if (easy.length < 4 || medium.length < 3 || hard.length < 3) {
+      throw Exception("Insufficient questions to generate the test.");
+    }
+
+    // Shuffle and select required number of questions
+    easy.shuffle();
+    medium.shuffle();
+    hard.shuffle();
+
+    final selectedQuestions = [
+      ...easy.sublist(0, 4),
+      ...medium.sublist(0, 3),
+      ...hard.sublist(0, 3),
+    ];
+
+    // Generate a unique 6-digit key
+    String key;
+    do {
+      key = Random().nextInt(1000000).toString().padLeft(6, '0');
+    } while (_testKeys.containsKey(key)); // Ensure uniqueness
+
+    _testKeys[key] = selectedQuestions;
+    notifyListeners();
+
+    return key;
+  }
+
+  /// Retrieves the list of questions associated with a given test key.
+  List<TestQuestion>? getTestByKey(String key) => _testKeys[key];
 }

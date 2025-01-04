@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../models/test_domain.dart';
 import '../../../../models/test_question.dart';
 import '../../../../models/test_question_option.dart';
 import '../../../../providers/admin_provider.dart';
@@ -124,10 +125,19 @@ class _TestsTabState extends State<TestsTab> {
                           ),
                           isThreeLine: true,
                           trailing: SizedBox(
-                            width: 170,
+                            width: 220, // Increased width to accommodate the new button
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
+                                // Generate Test Key Button
+                                IconButton(
+                                  icon: const Icon(Icons.key, color: Colors.purple),
+                                  tooltip: 'Generate Test Key',
+                                  onPressed: () {
+                                    _generateTestKeyDialog(t, adminProvider);
+                                  },
+                                ),
+                                const SizedBox(width: 4),
                                 IconButton(
                                   icon: const Icon(
                                     Icons.question_answer,
@@ -151,6 +161,7 @@ class _TestsTabState extends State<TestsTab> {
                                       color: Colors.red),
                                   onPressed: () {
                                     _confirmDeletion(
+                                      context: context,
                                       title: 'Delete Test',
                                       content:
                                       'Delete "${t.name}"?',
@@ -181,8 +192,8 @@ class _TestsTabState extends State<TestsTab> {
           child: SingleChildScrollView(
             child: Card(
               elevation: 2,
-              shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -225,30 +236,58 @@ class _TestsTabState extends State<TestsTab> {
                       maxLines: 1,
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      decoration:
-                      const InputDecoration(labelText: 'Select Domain'),
-                      items: adminProvider.testDomains
-                          .map(
-                            (dom) => DropdownMenuItem<int>(
-                          value: dom.id,
-                          child: Text(dom.name),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<int>(
+                            decoration: const InputDecoration(
+                                labelText: 'Select Domain'),
+                            value: null,
+                            items: [
+                              ...adminProvider.testDomains.map(
+                                    (dom) => DropdownMenuItem<int>(
+                                  value: dom.id,
+                                  child: Text(dom.name),
+                                ),
+                              ),
+                              const DropdownMenuItem<int>(
+                                value: -1,
+                                child: Text('Add New Domain'),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              if (val == -1) {
+                                _showAddDomainDialog(adminProvider);
+                              }
+                            },
+                            hint: const Text('Choose Domain'),
+                          ),
                         ),
-                      )
-                          .toList(),
-                      onChanged: (val) {
-                        // Handle domain selection if needed
-                      },
-                      hint: const Text('Choose Domain'),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     CustomTextField(
-                      label: 'Questions JSON',
+                      label: 'Questions JSON (Optional)',
                       controller: _questionsJsonController,
-                      maxLines: 2,
+                      maxLines: 4,
                       hintText:
-                      'Enter questions in JSON format.',
-                      //Example:\n[\n  {\n    "content": "Question 1",\n    "type": "easy",\n    "answerTime": 30,\n    "isActive": true,\n    "isMandatory": true,\n    "options": [\n      {"content": "Option 1", "isCorrect": true},\n      {"content": "Option 2", "isCorrect": false},\n      {"content": "Option 3", "isCorrect": false},\n      {"content": "Option 4", "isCorrect": false}\n    ]\n  }\n]
+                      'Enter questions in JSON format or leave empty.',
+                      // Example:
+                      // [
+                      //   {
+                      //     "content": "Question 1",
+                      //     "type": "easy",
+                      //     "answerTime": 30,
+                      //     "isActive": true,
+                      //     "isMandatory": true,
+                      //     "options": [
+                      //       {"content": "Option 1", "isCorrect": true},
+                      //       {"content": "Option 2", "isCorrect": false},
+                      //       {"content": "Option 3", "isCorrect": false},
+                      //       {"content": "Option 4", "isCorrect": false}
+                      //     ]
+                      //   }
+                      // ]
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -281,6 +320,63 @@ class _TestsTabState extends State<TestsTab> {
   }
 
   // ----------------------------------------------------------------------
+  // GENERATE TEST KEY DIALOG
+  // ----------------------------------------------------------------------
+  void _generateTestKeyDialog(TestModel test, AdminProvider adminProvider) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Generate Test Key'),
+          content: const Text(
+              'Do you want to generate a test key for this test? This will select 10 random MCQs (4 Easy, 3 Medium, 3 Hard).'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.pop(ctx),
+            ),
+            ElevatedButton(
+              child: const Text('Generate'),
+              onPressed: () {
+                try {
+                  final key = adminProvider.generateTestKey(test.id);
+                  Navigator.pop(ctx);
+                  _showTestKeyResultDialog(key);
+                } catch (e) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error: ${e.toString()}'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Displays the generated test key in a dialog.
+  void _showTestKeyResultDialog(String key) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Test Key'),
+        content: Text('Generated Key: $key'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ----------------------------------------------------------------------
   // ADD TEST WITH QUESTIONS LOGIC
   // ----------------------------------------------------------------------
   Future<void> _addTestWithQuestions(AdminProvider adminProvider) async {
@@ -288,29 +384,18 @@ class _TestsTabState extends State<TestsTab> {
     final name = _testNameController.text.trim();
     final grade = _testGradeController.text.trim();
     final durationText = _testDurationController.text.trim();
-    final domainId = adminProvider.testDomains.isNotEmpty
-        ? adminProvider.testDomains.first.id
-        : null;
+    final domainId = _getSelectedDomainId(adminProvider);
     final questionsJson = _questionsJsonController.text.trim();
 
     if (code.isEmpty ||
         name.isEmpty ||
         grade.isEmpty ||
         durationText.isEmpty ||
-        questionsJson.isEmpty) {
+        domainId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please fill all fields including Questions JSON.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (domainId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No domain available.'),
+          content:
+          Text('Please fill all fields including selecting a domain.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -328,80 +413,84 @@ class _TestsTabState extends State<TestsTab> {
       return;
     }
 
-    // Parse JSON
-    List<dynamic> questionsList;
-    try {
-      questionsList = json.decode(questionsJson);
-      if (questionsList is! List) {
-        throw FormatException('JSON is not a list.');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Invalid JSON format: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Validate and convert questions
-    List<Map<String, dynamic>> validQuestions = [];
-    for (var q in questionsList) {
-      if (q is! Map<String, dynamic>) {
+    // Parse JSON if provided
+    List<dynamic> questionsList = [];
+    if (questionsJson.isNotEmpty) {
+      try {
+        questionsList = json.decode(questionsJson);
+        if (questionsList is! List) {
+          throw FormatException('JSON is not a list.');
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Each question must be a JSON object.'),
+          SnackBar(
+            content: Text('Invalid JSON format: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
         return;
       }
 
-      // Required fields
-      if (!q.containsKey('content') ||
-          !q.containsKey('type') ||
-          !q.containsKey('answerTime') ||
-          !q.containsKey('isActive') ||
-          !q.containsKey('isMandatory') ||
-          !q.containsKey('options')) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Missing required fields in one of the questions.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      // Validate options
-      var options = q['options'];
-      if (options is! List || options.length < 2) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Each question must have at least two options.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      for (var opt in options) {
-        if (opt is! Map<String, dynamic> ||
-            !opt.containsKey('content') ||
-            !opt.containsKey('isCorrect')) {
+      // Validate and convert questions
+      List<Map<String, dynamic>> validQuestions = [];
+      for (var q in questionsList) {
+        if (q is! Map<String, dynamic>) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                  'Each option must have "content" and "isCorrect" fields.'),
+              content: Text('Each question must be a JSON object.'),
               backgroundColor: Colors.red,
             ),
           );
           return;
         }
-      }
 
-      validQuestions.add(q);
+        // Required fields
+        if (!q.containsKey('content') ||
+            !q.containsKey('type') ||
+            !q.containsKey('answerTime') ||
+            !q.containsKey('isActive') ||
+            !q.containsKey('isMandatory') ||
+            !q.containsKey('options')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+              Text('Missing required fields in one of the questions.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        // Validate options
+        var options = q['options'];
+        if (options is! List || options.length < 2) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+              Text('Each question must have at least two options.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        for (var opt in options) {
+          if (opt is! Map<String, dynamic> ||
+              !opt.containsKey('content') ||
+              !opt.containsKey('isCorrect')) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Each option must have "content" and "isCorrect" fields.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+        }
+
+        validQuestions.add(q);
+      }
     }
 
     // Create TestModel
@@ -417,53 +506,55 @@ class _TestsTabState extends State<TestsTab> {
       domainId: domainId,
     );
 
-    // Create TestQuestions and TestQuestionOptions
+    // Create TestQuestions and TestQuestionOptions if JSON was provided
     List<TestQuestion> testQuestions = [];
-    int questionIdCounter = adminProvider.getNextQuestionId();
-    int optionIdCounter = adminProvider.getNextOptionId();
+    if (questionsList.isNotEmpty) {
+      int questionIdCounter = adminProvider.getNextQuestionId();
+      int optionIdCounter = adminProvider.getNextOptionId();
 
-    int order = 1;
-    for (var q in validQuestions) {
-      String typeStr = q['type'].toString().toLowerCase();
-      QuestionType type;
-      switch (typeStr) {
-        case 'easy':
-          type = QuestionType.easy;
-          break;
-        case 'medium':
-          type = QuestionType.medium;
-          break;
-        case 'hard':
-          type = QuestionType.hard;
-          break;
-        default:
-          type = QuestionType.easy;
-      }
+      int order = 1;
+      for (var q in questionsList) {
+        String typeStr = q['type'].toString().toLowerCase();
+        QuestionType type;
+        switch (typeStr) {
+          case 'easy':
+            type = QuestionType.easy;
+            break;
+          case 'medium':
+            type = QuestionType.medium;
+            break;
+          case 'hard':
+            type = QuestionType.hard;
+            break;
+          default:
+            type = QuestionType.easy;
+        }
 
-      List<dynamic> options = q['options'];
-      List<TestQuestionOption> questionOptions = [];
-      for (var opt in options) {
-        questionOptions.add(TestQuestionOption(
-          id: optionIdCounter++,
-          questionId: questionIdCounter,
-          content: opt['content'],
-          order: questionOptions.length + 1,
-          isCorrect: opt['isCorrect'],
+        List<dynamic> options = q['options'];
+        List<TestQuestionOption> questionOptions = [];
+        for (var opt in options) {
+          questionOptions.add(TestQuestionOption(
+            id: optionIdCounter++,
+            questionId: questionIdCounter,
+            content: opt['content'],
+            order: questionOptions.length + 1,
+            isCorrect: opt['isCorrect'],
+          ));
+        }
+
+        testQuestions.add(TestQuestion(
+          id: questionIdCounter++,
+          testId: newTest.id,
+          type: type,
+          content: q['content'],
+          picture: null, // Assuming no picture
+          order: order++,
+          answerTime: q['answerTime'],
+          isActive: q['isActive'],
+          isMandatory: q['isMandatory'],
+          options: questionOptions,
         ));
       }
-
-      testQuestions.add(TestQuestion(
-        id: questionIdCounter++,
-        testId: newTest.id,
-        type: type,
-        content: q['content'],
-        picture: null, // Assuming no picture
-        order: order++,
-        answerTime: q['answerTime'],
-        isActive: q['isActive'],
-        isMandatory: q['isMandatory'],
-        options: questionOptions,
-      ));
     }
 
     // Add Test and Questions via AdminProvider
@@ -478,7 +569,7 @@ class _TestsTabState extends State<TestsTab> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Test and questions added successfully.'),
+          content: Text('Test added successfully.'),
           backgroundColor: Colors.green,
         ),
       );
@@ -493,9 +584,98 @@ class _TestsTabState extends State<TestsTab> {
   }
 
   // ----------------------------------------------------------------------
+  // Helper to get selected domain ID
+  // ----------------------------------------------------------------------
+  int? _getSelectedDomainId(AdminProvider adminProvider) {
+    // Implement logic to retrieve selected domain ID from dropdown
+    // This can be managed using a separate state variable
+    // For simplicity, assuming the first domain is selected
+    if (adminProvider.testDomains.isNotEmpty) {
+      return adminProvider.testDomains.first.id;
+    }
+    return null;
+  }
+
+  // ----------------------------------------------------------------------
+  // ADD NEW DOMAIN DIALOG
+  // ----------------------------------------------------------------------
+  void _showAddDomainDialog(AdminProvider adminProvider) {
+    final TextEditingController _domainNameController = TextEditingController();
+    final TextEditingController _domainDescController = TextEditingController();
+    final _formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Add New Domain',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CustomTextField(
+                  label: 'Domain Name',
+                  controller: _domainNameController,
+                  validator: (value) => (value == null || value.isEmpty)
+                      ? 'Please enter domain name'
+                      : null,
+                ),
+                const SizedBox(height: 12),
+                CustomTextField(
+                  label: 'Description',
+                  controller: _domainDescController,
+                  validator: (value) => (value == null || value.isEmpty)
+                      ? 'Please enter description'
+                      : null,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              child:
+              const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              onPressed: () => Navigator.pop(ctx),
+            ),
+            ElevatedButton(
+              child: const Text('Add'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  final newDomain = TestDomain(
+                    id: adminProvider.testDomains.isEmpty
+                        ? 1
+                        : adminProvider.testDomains
+                        .map((dom) => dom.id)
+                        .reduce((a, b) => a > b ? a : b) +
+                        1,
+                    name: _domainNameController.text.trim(),
+                    description: _domainDescController.text.trim(),
+                    createdAt: DateTime.now(),
+                  );
+                  adminProvider.addTestDomain(newDomain);
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Domain added successfully.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // ----------------------------------------------------------------------
   // CONFIRM DELETION HELPER
   // ----------------------------------------------------------------------
   void _confirmDeletion({
+    required BuildContext context,
     required String title,
     required String content,
     required VoidCallback onConfirm,
@@ -515,8 +695,13 @@ class _TestsTabState extends State<TestsTab> {
             ),
             ElevatedButton(
               onPressed: onConfirm,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Delete'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.white), // White text for visibility
+              ),
             ),
           ],
         );
@@ -524,6 +709,9 @@ class _TestsTabState extends State<TestsTab> {
     );
   }
 
+  // ----------------------------------------------------------------------
+  // EDIT TEST DIALOG
+  // ----------------------------------------------------------------------
   void _showEditTestDialog(TestModel test, AdminProvider adminProvider) {
     final _editCodeController = TextEditingController(text: test.code);
     final _editNameController = TextEditingController(text: test.name);
@@ -545,17 +733,20 @@ class _TestsTabState extends State<TestsTab> {
                 child: Column(
                   children: [
                     CustomTextField(
-                        label: 'Test Code', controller: _editCodeController,
+                        label: 'Test Code',
+                        controller: _editCodeController,
                         hintText: 'Enter unique test code',
                         maxLines: 1),
                     const SizedBox(height: 12),
                     CustomTextField(
-                        label: 'Test Name', controller: _editNameController,
+                        label: 'Test Name',
+                        controller: _editNameController,
                         hintText: 'Enter test name',
                         maxLines: 1),
                     const SizedBox(height: 12),
                     CustomTextField(
-                        label: 'Grade', controller: _editGradeController,
+                        label: 'Grade',
+                        controller: _editGradeController,
                         hintText: 'Enter grade level',
                         maxLines: 1),
                     const SizedBox(height: 12),
@@ -567,26 +758,38 @@ class _TestsTabState extends State<TestsTab> {
                       maxLines: 1,
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      decoration:
-                      const InputDecoration(labelText: 'Select Domain'),
-                      value: selectedDomainId,
-                      items: adminProvider.testDomains
-                          .map(
-                            (dom) => DropdownMenuItem<int>(
-                          value: dom.id,
-                          child: Text(dom.name),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<int>(
+                            decoration: const InputDecoration(
+                                labelText: 'Select Domain'),
+                            value: selectedDomainId,
+                            items: [
+                              ...adminProvider.testDomains.map(
+                                    (dom) => DropdownMenuItem<int>(
+                                  value: dom.id,
+                                  child: Text(dom.name),
+                                ),
+                              ),
+                              const DropdownMenuItem<int>(
+                                value: -1,
+                                child: Text('Add New Domain'),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              if (val == -1) {
+                                _showAddDomainDialog(adminProvider);
+                              } else if (val != null) {
+                                setStateDialog(() {
+                                  selectedDomainId = val;
+                                });
+                              }
+                            },
+                            hint: const Text('Choose Domain'),
+                          ),
                         ),
-                      )
-                          .toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setStateDialog(() {
-                            selectedDomainId = val;
-                          });
-                        }
-                      },
-                      hint: const Text('Choose Domain'),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -613,15 +816,17 @@ class _TestsTabState extends State<TestsTab> {
                   onPressed: () => Navigator.pop(ctx),
                 ),
                 ElevatedButton(
-                  child: const Text('Save'),
+                  child: const Text('Save',
+                      style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     if (_editCodeController.text.trim().isEmpty ||
                         _editNameController.text.trim().isEmpty ||
                         _editGradeController.text.trim().isEmpty ||
-                        _editDurationController.text.trim().isEmpty) {
+                        _editDurationController.text.trim().isEmpty ||
+                        selectedDomainId == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                            content: Text('Fill all fields'),
+                            content: Text('Fill all fields including domain'),
                             backgroundColor: Colors.red),
                       );
                       return;
