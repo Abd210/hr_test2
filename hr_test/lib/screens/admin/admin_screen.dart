@@ -1,12 +1,12 @@
 // lib/screens/admin/admin_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:hr_test/screens/admin/tabs/organization_tab/organizations_tab.dart';
+import 'package:hr_test/screens/admin/tabs/test_tab/tests_tab.dart';
+import 'package:hr_test/screens/admin/tabs/user_tab/users_tab.dart';
 import 'package:provider/provider.dart';
 import '../../models/test_model.dart';
 import 'tabs/dashboard_tab/dashboard_tab.dart';
-import 'tabs/organization_tab/organizations_tab.dart';
-import 'tabs/user_tab/users_tab.dart';
-import 'tabs/test_tab/tests_tab.dart';
 import '../../providers/admin_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/persistent_navbar.dart';
@@ -63,7 +63,9 @@ class _AdminScreenState extends State<AdminScreen> {
                     // Top bar
                     Container(
                       height: 60,
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color: Theme.of(context)
+                          .primaryColor
+                          .withOpacity(0.1),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
@@ -98,10 +100,10 @@ class _AdminScreenState extends State<AdminScreen> {
                           const DashboardScreen(),
 
                           // 1 => Organizations
-                          OrganizationsTab(),
+                          const OrganizationsTab(),
 
                           // 2 => Users
-                          UsersTab(),
+                          const UsersTab(),
 
                           // 3 => Tests
                           TestsTab(

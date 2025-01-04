@@ -1,4 +1,5 @@
-//custom_button.dart
+// lib/widgets/custom_button.dart
+
 import 'package:flutter/material.dart';
 
 /// Adjust this color to match your existing backgroundLight color:
@@ -26,8 +27,14 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color buttonTextColor = backgroundLight;
-    // <-- All button text is backgroundLight now
+    // Determine text color based on button type and color brightness
+    Color buttonTextColor;
+    if (isOutlined) {
+      buttonTextColor = color ?? Theme.of(context).primaryColor;
+    } else {
+      // For ElevatedButton, set text color to white as per user request
+      buttonTextColor = Colors.white;
+    }
 
     if (isOutlined) {
       return OutlinedButton.icon(
@@ -40,7 +47,7 @@ class CustomButton extends StatelessWidget {
         label: Text(
           text,
           style: TextStyle(
-            color: buttonTextColor, // <-- text color here
+            color: buttonTextColor, // Text color for outlined button
           ),
         ),
         style: OutlinedButton.styleFrom(
@@ -57,11 +64,16 @@ class CustomButton extends StatelessWidget {
       );
     } else {
       return ElevatedButton.icon(
-        icon: icon != null ? Icon(icon, color: buttonTextColor) : const SizedBox.shrink(),
+        icon: icon != null
+            ? Icon(
+          icon,
+          color: buttonTextColor, // Icon color
+        )
+            : const SizedBox.shrink(),
         label: Text(
           text,
           style: TextStyle(
-            color: buttonTextColor, // <-- text color here
+            color: buttonTextColor, // Text color for elevated button
           ),
         ),
         style: ElevatedButton.styleFrom(

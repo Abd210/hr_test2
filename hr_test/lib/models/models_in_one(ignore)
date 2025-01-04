@@ -1,0 +1,151 @@
+//organization.dart
+class Organization {
+  final int id;
+  String name;
+  String description;
+  DateTime createdAt;
+
+  Organization({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.createdAt,
+  });
+}
+//Permission.dart
+class Permission {
+  final int id;
+  final String permissionName;
+  final String description;
+
+  Permission({
+    required this.id,
+    required this.permissionName,
+    required this.description,
+  });
+}
+//Role.dart
+class Role {
+  final int id;
+  String roleName;
+  String description;
+
+  Role({
+    required this.id,
+    required this.roleName,
+    required this.description,
+  });
+}
+// lib/models/test_domain.dart
+
+class TestDomain {
+  final int id;
+  String name;
+  String description;
+  DateTime createdAt;
+
+  TestDomain({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.createdAt,
+  });
+}
+// lib/models/test_model.dart
+
+class TestModel {
+  final int id;
+  String code;
+  String name;
+  String grade;
+  DateTime date;
+  int duration;
+  bool isActive;
+  DateTime createdAt;
+  int domainId;
+
+  TestModel({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.grade,
+    required this.date,
+    required this.duration,
+    required this.isActive,
+    required this.createdAt,
+    required this.domainId,
+  });
+}
+// lib/models/test_question.dart
+
+import 'package:hr_test/models/test_question_option.dart';
+
+enum QuestionType { easy, medium, hard }
+
+class TestQuestion {
+  final int id;
+  final int testId;
+  final QuestionType type;
+  final String content;
+  final String? picture;
+  final int order;
+  final int answerTime; // Time in seconds
+  final bool isActive;
+  final bool isMandatory;
+  final List<TestQuestionOption> options;
+
+  TestQuestion({
+    required this.id,
+    required this.testId,
+    required this.type,
+    required this.content,
+    this.picture,
+    required this.order,
+    required this.answerTime,
+    required this.isActive,
+    required this.isMandatory,
+    required this.options,
+  });
+}
+// lib/models/test_question_option.dart
+
+class TestQuestionOption {
+  final int id;
+  final int questionId;
+  final String content;
+  final int order;
+  final bool isCorrect;
+
+  TestQuestionOption({
+    required this.id,
+    required this.questionId,
+    required this.content,
+    required this.order,
+    required this.isCorrect,
+  });
+}
+// lib/models/user.dart
+import 'role.dart';
+import 'organization.dart';
+
+class User {
+  final int id;
+  String username;
+  String email;
+  String password;
+  String? phoneNumber;
+  DateTime createdAt;
+  List<Role> roles;
+  Organization organization;
+
+  User({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.password,
+    this.phoneNumber,
+    required this.createdAt,
+    required this.roles,
+    required this.organization,
+  });
+}

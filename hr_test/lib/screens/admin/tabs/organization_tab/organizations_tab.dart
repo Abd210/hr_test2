@@ -55,6 +55,8 @@ class _OrganizationsTabState extends State<OrganizationsTab> {
                         label: 'Search Organizations...',
                         controller: _orgSearchController,
                         onChanged: (_) => setState(() {}),
+                        hintText: 'Search by name or description',
+                        maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -132,8 +134,8 @@ class _OrganizationsTabState extends State<OrganizationsTab> {
           child: SingleChildScrollView(
             child: Card(
               elevation: 2,
-              shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -150,11 +152,19 @@ class _OrganizationsTabState extends State<OrganizationsTab> {
                     CustomTextField(
                       label: 'Organization Name',
                       controller: _orgNameController,
+                      validator: (value) =>
+                      (value == null || value.isEmpty)
+                          ? 'Please enter organization name'
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     CustomTextField(
                       label: 'Description',
                       controller: _orgDescController,
+                      validator: (value) =>
+                      (value == null || value.isEmpty)
+                          ? 'Please enter description'
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     CustomButton(
@@ -245,10 +255,19 @@ class _OrganizationsTabState extends State<OrganizationsTab> {
               children: [
                 CustomTextField(
                     label: 'Organization Name',
-                    controller: _editNameController),
+                    controller: _editNameController,
+                    validator: (value) =>
+                    (value == null || value.isEmpty)
+                        ? 'Please enter organization name'
+                        : null),
                 const SizedBox(height: 12),
                 CustomTextField(
-                    label: 'Description', controller: _editDescController),
+                    label: 'Description',
+                    controller: _editDescController,
+                    validator: (value) =>
+                    (value == null || value.isEmpty)
+                        ? 'Please enter description'
+                        : null),
               ],
             ),
           ),

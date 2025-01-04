@@ -1,9 +1,14 @@
-//login_screen.dart
+// lib/screens/login_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/organization.dart';
+import '../models/user.dart';
 import '../providers/auth_provider.dart';
+import '../providers/admin_provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
+import 'test_screen.dart'; // Ensure you have a TestScreen to display the test
 
 /// Example palette for background:
 const Color primaryDarkGreen = Color(0xFF1F4529);
@@ -37,15 +42,31 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _attemptLogin(AuthProvider authProvider) {
-    if (_formKey.currentState!.validate()) {
-      final success = authProvider.login(
-        _usernameController.text.trim(),
-        _passwordController.text.trim(),
-      );
+  /// Attempts to log in using credentials or a test key.
+  void _attemptLogin(AuthProvider authProvider, AdminProvider adminProvider) {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    // Check if the input matches any user's credentials
+    final user = authProvider.allUsers.firstWhere(
+          (u) => u.username == username && u.password == password,
+      orElse: () => User(
+          id: -1,
+          username: '',
+          email: '',
+          password: '',
+          phoneNumber: '',
+          createdAt: DateTime.now(),
+          roles: [],
+          organization: Organization(
+              id: 0, name: '', description: '', createdAt: DateTime.now())),
+    );
+
+    if (user.id != -1) {
+      // Valid user credentials
+      final success = authProvider.login(username, password);
       if (success) {
-        if (authProvider.currentUser != null &&
-            authProvider.currentUser!.roles.any((r) => r.roleName == 'SuperAdmin')) {
+        if (user.roles.any((r) => r.roleName == 'SuperAdmin')) {
           Navigator.pushReplacementNamed(context, '/admin');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -54,18 +75,38 @@ class _LoginScreenState extends State<LoginScreen> {
               backgroundColor: Colors.green,
             ),
           );
+          // Navigate to user-specific dashboard or home
         }
       } else {
         setState(() {
           _error = 'Invalid credentials. Please try again.';
         });
       }
+      return;
     }
+
+    // If not a valid user, treat the password field as a test key
+    final questions = adminProvider.getTestByKey(password);
+    if (questions != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TestScreen(questions: questions),
+        ),
+      );
+      return;
+    }
+
+    // If neither, show error
+    setState(() {
+      _error = 'Invalid credentials or test key.';
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final adminProvider = Provider.of<AdminProvider>(context);
 
     return Scaffold(
       // Enhanced background with gradient
@@ -116,17 +157,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       CustomTextField(
                         label: 'Username',
                         controller: _usernameController,
-                        validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Enter username' : null,
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Enter username or leave blank for test key'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       // Password Field
                       CustomTextField(
-                        label: 'Password',
+                        label: 'Password / Test Key',
                         controller: _passwordController,
                         obscureText: !_passwordVisible,
-                        validator: (value) =>
-                        (value == null || value.isEmpty) ? 'Enter password' : null,
+                        validator: (value) => (value == null || value.isEmpty)
+                            ? 'Enter password or test key'
+                            : null,
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
@@ -145,7 +188,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       CustomButton(
                         text: 'Login',
                         icon: Icons.login,
-                        onPressed: () => _attemptLogin(authProvider),
+                        onPressed: () =>
+                            _attemptLogin(authProvider, adminProvider),
                         width: double.infinity,
                       ),
                       if (_error.isNotEmpty)
