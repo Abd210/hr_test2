@@ -337,7 +337,7 @@ class _TestsTabState extends State<TestsTab> {
               onPressed: () => Navigator.pop(ctx),
             ),
             ElevatedButton(
-              child: const Text('Generate'),
+              child: const Text('Generate',style: TextStyle(color: Colors.white),),
               onPressed: () {
                 try {
                   final key = adminProvider.generateTestKey(test.id);
@@ -370,7 +370,7 @@ class _TestsTabState extends State<TestsTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: const Text('OK',style: TextStyle(color: Colors.white),),
           ),
         ],
       ),
