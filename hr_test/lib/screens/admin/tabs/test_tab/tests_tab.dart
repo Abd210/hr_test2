@@ -131,7 +131,8 @@ class _TestsTabState extends State<TestsTab> {
                               children: [
                                 // Generate Test Key Button
                                 IconButton(
-                                  icon: const Icon(Icons.key, color: Colors.purple),
+                                  icon: const Icon(Icons.key,
+                                      color: Colors.purple),
                                   tooltip: 'Generate Test Key',
                                   onPressed: () {
                                     _generateTestKeyDialog(t, adminProvider);
@@ -365,7 +366,7 @@ class _TestsTabState extends State<TestsTab> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Test Key'),
-        content: Text('Generated Key: $key'),
+        content: SelectableText('Generated Key: $key'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -695,13 +696,8 @@ class _TestsTabState extends State<TestsTab> {
             ),
             ElevatedButton(
               onPressed: onConfirm,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              child: const Text(
-                'Delete',
-                style: TextStyle(color: Colors.white), // White text for visibility
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Delete'),
             ),
           ],
         );

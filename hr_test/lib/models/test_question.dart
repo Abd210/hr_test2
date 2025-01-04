@@ -11,7 +11,7 @@ class TestQuestion {
   final String content;
   final String? picture;
   final int order;
-  final int answerTime;
+  final int answerTime; // Time in seconds
   final bool isActive;
   final bool isMandatory;
   final List<TestQuestionOption> options;
