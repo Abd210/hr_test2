@@ -24,6 +24,12 @@ class AdminProvider with ChangeNotifier {
       description: 'Handles all HR related tasks.',
       createdAt: DateTime.now(),
     ),
+    Organization(
+      id: 2,
+      name: 'IT Department',
+      description: 'Handles all IT related tasks.',
+      createdAt: DateTime.now(),
+    ),
     // Add more organizations as needed
   ];
 

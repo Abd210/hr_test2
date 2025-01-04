@@ -344,7 +344,7 @@ class _UsersTabState extends State<UsersTab> {
                   onPressed: () => Navigator.pop(ctx),
                 ),
                 ElevatedButton(
-                  child: const Text('Save'),
+                  child: const Text('Save',style: TextStyle(color: Colors.white),),
                   onPressed: () {
                     if (_editNameController.text.trim().isEmpty ||
                         _editEmailController.text.trim().isEmpty ||
