@@ -30,6 +30,12 @@ class AdminProvider with ChangeNotifier {
       description: 'Handles all IT related tasks.',
       createdAt: DateTime.now(),
     ),
+    Organization(
+      id: 3,
+      name: 'Marketing Department',
+      description: 'Handles all marketing and advertising tasks.',
+      createdAt: DateTime.now(),
+    ),
     // Add more organizations as needed
   ];
 

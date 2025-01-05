@@ -39,7 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Controller for Organization Login
   final TextEditingController _organizationNameController =
+  TextEditingController(text: 'HR department');
+  final TextEditingController _organizationPasswordController=
   TextEditingController();
+
 
   bool _passwordVisible = false;
   String _error = '';
@@ -297,6 +300,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? 'Enter organization name'
                                 : null,
                           ),
+                          CustomTextField(
+                            label: 'Password',
+                            controller: _organizationPasswordController,
+                            obscureText: !_passwordVisible,
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _passwordVisible = !_passwordVisible;
+                                });
+                              },
+                              icon: Icon(
+                                _passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                            ),
+                          ),
+
                         ],
                         const SizedBox(height: 24),
                         // Login Button
