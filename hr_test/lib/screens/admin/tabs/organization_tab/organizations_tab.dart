@@ -278,7 +278,7 @@ class _OrganizationsTabState extends State<OrganizationsTab> {
               onPressed: () => Navigator.pop(ctx),
             ),
             ElevatedButton(
-              child: const Text('Save'),
+              child: const Text('Save',style: TextStyle(color: Colors.white),),
               onPressed: () {
                 if (_editNameController.text.trim().isEmpty ||
                     _editDescController.text.trim().isEmpty) {

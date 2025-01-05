@@ -1,38 +1,26 @@
-// lib/screens/admin/tabs/tests_tab.dart
+// lib/screens/organization/tabs/organization_tests_tab.dart
 
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../models/test_domain.dart';
-import '../../../../models/test_question.dart';
-import '../../../../models/test_question_option.dart';
-import '../../../../providers/admin_provider.dart';
-import '../../../../widgets/custom_text_field.dart';
-import '../../../../widgets/custom_button.dart';
-import '../../../../models/test_model.dart';
-import 'manage_questions_tab.dart';
+import '../../../models/test_domain.dart';
+import '../../../models/test_model.dart';
+import '../../../models/test_question.dart';
+import '../../../models/test_question_option.dart';
+import '../../../providers/admin_provider.dart';
+import '../../../providers/auth_provider.dart';
+import '../../../widgets/custom_text_field.dart';
+import '../../../widgets/custom_button.dart';
 
-class TestsTab extends StatefulWidget {
-  final bool showManageQuestions;
-  final TestModel? selectedTestForQuestions;
-  final Function(TestModel) onManageQuestions;
-  final VoidCallback onCloseManageQuestions;
-
-  const TestsTab({
-    Key? key,
-    required this.showManageQuestions,
-    required this.selectedTestForQuestions,
-    required this.onManageQuestions,
-    required this.onCloseManageQuestions,
-  }) : super(key: key);
+class OrganizationTestsTab extends StatefulWidget {
+  const OrganizationTestsTab({Key? key}) : super(key: key);
 
   @override
-  State<TestsTab> createState() => _TestsTabState();
+  State<OrganizationTestsTab> createState() => _OrganizationTestsTabState();
 }
 
-class _TestsTabState extends State<TestsTab> {
-  // Controllers for Tests
+class _OrganizationTestsTabState extends State<OrganizationTestsTab> {
   final TextEditingController _testSearchController = TextEditingController();
   final TextEditingController _testCodeController = TextEditingController();
   final TextEditingController _testNameController = TextEditingController();
@@ -42,7 +30,6 @@ class _TestsTabState extends State<TestsTab> {
 
   @override
   void dispose() {
-    // Dispose controllers
     _testSearchController.dispose();
     _testCodeController.dispose();
     _testNameController.dispose();
@@ -54,23 +41,18 @@ class _TestsTabState extends State<TestsTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.showManageQuestions && widget.selectedTestForQuestions != null) {
-      // Show inline ManageQuestionsTab
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ManageQuestionTab(
-          test: widget.selectedTestForQuestions!,
-          onBack: widget.onCloseManageQuestions,
-        ),
-      );
-    }
-
     final adminProvider = Provider.of<AdminProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final organization = authProvider.currentOrganization;
+
+    // Filter tests based on organization
     final filtered = adminProvider.tests.where((t) {
       final query = _testSearchController.text.trim().toLowerCase();
-      return t.name.toLowerCase().contains(query) ||
-          t.code.toLowerCase().contains(query) ||
-          t.grade.toLowerCase().contains(query);
+      final belongsToOrg = t.domainId == organization?.id;
+      return belongsToOrg &&
+          (t.name.toLowerCase().contains(query) ||
+              t.code.toLowerCase().contains(query) ||
+              t.grade.toLowerCase().contains(query));
     }).toList();
 
     return Row(
@@ -146,7 +128,14 @@ class _TestsTabState extends State<TestsTab> {
                                   ),
                                   tooltip: 'Manage Questions',
                                   onPressed: () {
-                                    widget.onManageQuestions(t);
+                                    // Implement manage questions functionality
+                                    // For simplicity, show a snackbar
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Manage Questions not implemented.'),
+                                      ),
+                                    );
                                   },
                                 ),
                                 IconButton(
@@ -337,7 +326,7 @@ class _TestsTabState extends State<TestsTab> {
               onPressed: () => Navigator.pop(ctx),
             ),
             ElevatedButton(
-              child: const Text('Generate',style: TextStyle(color: Colors.white),),
+              child: const Text('Generate'),
               onPressed: () {
                 try {
                   final key = adminProvider.generateTestKey(test.id);
@@ -370,7 +359,7 @@ class _TestsTabState extends State<TestsTab> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK',style: TextStyle(color: Colors.white),),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -467,8 +456,7 @@ class _TestsTabState extends State<TestsTab> {
         if (options is! List || options.length < 2) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content:
-              Text('Each question must have at least two options.'),
+              content: Text('Each question must have at least two options.'),
               backgroundColor: Colors.red,
             ),
           );
@@ -724,7 +712,7 @@ class _TestsTabState extends State<TestsTab> {
           builder: (dialogCtx, setStateDialog) {
             return AlertDialog(
               title: const Text('Edit Test',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
               content: SingleChildScrollView(
                 child: Column(
                   children: [

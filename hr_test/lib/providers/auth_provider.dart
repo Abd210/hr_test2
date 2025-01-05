@@ -1,4 +1,5 @@
-//auth_provider.dart
+// lib/providers/auth_provider.dart
+
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 import '../models/role.dart';
@@ -7,8 +8,10 @@ import '../utils/constants.dart';
 
 class AuthProvider with ChangeNotifier {
   User? _currentUser;
+  Organization? _currentOrganization;
 
   User? get currentUser => _currentUser;
+  Organization? get currentOrganization => _currentOrganization;
 
   // Sample users for demonstration purposes
   final List<User> _users = [
@@ -64,6 +67,7 @@ class AuthProvider with ChangeNotifier {
       User user = _users.firstWhere(
               (user) => user.username == username && user.password == password);
       _currentUser = user;
+      _currentOrganization = null;
       notifyListeners();
       return true;
     } catch (e) {
@@ -71,9 +75,17 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  /// Logs out the current user.
+  /// Logs in as an organization without requiring a password.
+  void loginAsOrganization(Organization organization) {
+    _currentOrganization = organization;
+    _currentUser = null;
+    notifyListeners();
+  }
+
+  /// Logs out the current user or organization.
   void logout() {
     _currentUser = null;
+    _currentOrganization = null;
     notifyListeners();
   }
 

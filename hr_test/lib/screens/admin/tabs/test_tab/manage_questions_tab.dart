@@ -194,7 +194,7 @@ class _ManageQuestionTabState extends State<ManageQuestionTab> {
             return AlertDialog(
               title: const Text(
                 'Edit Question',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
               ),
               content: SingleChildScrollView(
                 child: Form(
