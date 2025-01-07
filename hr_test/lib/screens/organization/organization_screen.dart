@@ -1,15 +1,16 @@
-// lib/screens/organization/organization_screen.dart
-
 import 'package:flutter/material.dart';
+import 'package:hr_test/screens/organization/tabs/users_tab/domain_tab_org.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/admin_provider.dart';
 import '../../widgets/persistent_navbar.dart';
 import '../../widgets/background_animation.dart';
-import '../admin/tabs/dashboard_tab/dashboard_tab.dart'; // Reusing DashboardScreen
-import '../admin/tabs/test_tab/tests_tab.dart'; // Reusing TestsTab
-import 'tabs/users_tab/organization_users_tab.dart'; // New UsersTab
-import '../../widgets/custom_button.dart';
+import '../../utils/theme.dart';
+
+// Example reused from admin
+import '../admin/tabs/dashboard_tab/dashboard_tab.dart';
+
+import 'tabs/users_tab/organization_users_tab.dart';
 
 class OrganizationScreen extends StatefulWidget {
   const OrganizationScreen({Key? key}) : super(key: key);
@@ -19,40 +20,43 @@ class OrganizationScreen extends StatefulWidget {
 }
 
 class _OrganizationScreenState extends State<OrganizationScreen> {
-  // Current tab index
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final adminProvider = Provider.of<AdminProvider>(context, listen: false);
     final organization = authProvider.currentOrganization;
+
+    // If for some reason organization is null, maybe show an error or redirect
+    if (organization == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: const Center(
+          child: Text('No organization found. Please login as organization.'),
+        ),
+      );
+    }
 
     return Scaffold(
       body: Stack(
         children: [
-          // Background wave animation
           const BackgroundAnimation(),
 
-          // Main content
           Row(
             children: [
-              // Left persistent navbar with dynamic items
+              // left persistent navbar with isAdmin=false
               PersistentNavbar(
                 currentIndex: _currentIndex,
                 onItemSelected: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
+                  setState(() => _currentIndex = index);
                 },
-                isAdmin: false, // Indicate that this is for Organization
+                isAdmin: false,
               ),
 
-              // Main area
               Expanded(
                 child: Column(
                   children: [
-                    // Top bar
+                    // top bar
                     Container(
                       height: 60,
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -60,7 +64,7 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
                       child: Row(
                         children: [
                           Text(
-                            '${organization?.name ?? 'Organization'} Dashboard',
+                            '${organization.name} Dashboard',
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 20,
@@ -81,34 +85,17 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
                       ),
                     ),
 
-                    // Body: Tabs managed by separate widgets
+                    // body => your tabs
                     Expanded(
                       child: IndexedStack(
                         index: _currentIndex,
                         children: [
-                          // 0 => DashboardScreen (Reused from Admin)
+                          // 0 => Dashboard
                           const DashboardScreen(),
-
-                          // 1 => Users (New OrganizationUsersTab)
+                          // 1 => OrganizationUsersTab
                           const OrganizationUsersTab(),
-
-                          // 2 => Tests (Reused from Admin)
-                          TestsTab(
-                            showManageQuestions: false, // Organizations might not need this
-                            selectedTestForQuestions: null,
-
-                            onManageQuestions: (test) {
-                              // Implement if needed
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Manage Questions not available.'),
-                                ),
-                              );
-                            },
-                            onCloseManageQuestions: () {
-                              // Implement if needed
-                            },
-                          ),
+                          // 2 => DomainTabOrg, but we pass "organization"
+                          DomainTabOrg(organization: organization),
                         ],
                       ),
                     ),

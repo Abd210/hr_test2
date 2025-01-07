@@ -1,5 +1,3 @@
-// lib/widgets/custom_button.dart
-
 import 'package:flutter/material.dart';
 
 /// Adjust this color to match your existing backgroundLight color:
@@ -7,7 +5,7 @@ const Color backgroundLight = Color(0xFFE8ECD7);
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // <-- Now nullable
   final Color? color;
   final double? width;
   final double? height;
@@ -17,7 +15,7 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     Key? key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,  // <-- Accept null
     this.color,
     this.width,
     this.height,
@@ -32,7 +30,7 @@ class CustomButton extends StatelessWidget {
     if (isOutlined) {
       buttonTextColor = color ?? Theme.of(context).primaryColor;
     } else {
-      // For ElevatedButton, set text color to white as per user request
+      // For ElevatedButton, set text color to white
       buttonTextColor = Colors.white;
     }
 
@@ -47,7 +45,7 @@ class CustomButton extends StatelessWidget {
         label: Text(
           text,
           style: TextStyle(
-            color: buttonTextColor, // Text color for outlined button
+            color: buttonTextColor,
           ),
         ),
         style: OutlinedButton.styleFrom(
@@ -60,20 +58,20 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: onPressed,
+        onPressed: onPressed, // Can be null
       );
     } else {
       return ElevatedButton.icon(
         icon: icon != null
             ? Icon(
           icon,
-          color: buttonTextColor, // Icon color
+          color: buttonTextColor,
         )
             : const SizedBox.shrink(),
         label: Text(
           text,
           style: TextStyle(
-            color: buttonTextColor, // Text color for elevated button
+            color: buttonTextColor,
           ),
         ),
         style: ElevatedButton.styleFrom(
@@ -83,7 +81,7 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: onPressed,
+        onPressed: onPressed, // Can be null
       );
     }
   }

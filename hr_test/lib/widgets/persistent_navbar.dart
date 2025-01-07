@@ -1,7 +1,7 @@
-// lib/widgets/persistent_navbar.dart
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/theme.dart';
+import '../providers/auth_provider.dart';
 
 class PersistentNavbar extends StatefulWidget {
   final int currentIndex;
@@ -12,7 +12,7 @@ class PersistentNavbar extends StatefulWidget {
     Key? key,
     required this.currentIndex,
     this.onItemSelected,
-    this.isAdmin = true, // Default to Admin
+    this.isAdmin = true,
   }) : super(key: key);
 
   @override
@@ -22,34 +22,40 @@ class PersistentNavbar extends StatefulWidget {
 class _PersistentNavbarState extends State<PersistentNavbar>
     with TickerProviderStateMixin {
   late int _selectedIndex;
-
-  // Animation Controllers for labels
+  late List<_NavItemData> _navItems;
   late List<AnimationController> _labelControllers;
   late List<Animation<double>> _labelAnimations;
-
-  // Define navigation items based on the user role
-  late final List<_NavItemData> _navItems;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.currentIndex;
+    _initNavItems();
+    _initAnimations();
+    _labelControllers[_selectedIndex].forward();
+  }
 
-    // Initialize navigation items based on isAdmin
-    _navItems = widget.isAdmin
-        ? [
-      _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-      _NavItemData(icon: Icons.apartment, label: 'Organizations'), // 1
-      _NavItemData(icon: Icons.people, label: 'Users'), // 2
-      _NavItemData(icon: Icons.assessment, label: 'Tests'), // 3
-    ]
-        : [
-      _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-      _NavItemData(icon: Icons.people, label: 'Users'), // 1
-      _NavItemData(icon: Icons.assessment, label: 'Tests'), // 2
-    ];
+  void _initNavItems() {
+    if (widget.isAdmin) {
+      // e.g. Admin => 5 items
+      _navItems = [
+        _NavItemData(icon: Icons.dashboard, label: 'Dashboard'),     // index 0
+        _NavItemData(icon: Icons.apartment, label: 'Organizations'), // index 1
+        _NavItemData(icon: Icons.people, label: 'Users'),            // index 2
+        _NavItemData(icon: Icons.assessment, label: 'Domains'),      // index 3
+        _NavItemData(icon: Icons.list_alt, label: 'All Tests'),      // index 4
+      ];
+    } else {
+      // org => fewer items: dashboard, users, domain
+      _navItems = [
+        _NavItemData(icon: Icons.dashboard, label: 'Dashboard'),  // index 0
+        _NavItemData(icon: Icons.people, label: 'Users'),         // index 1
+        _NavItemData(icon: Icons.assessment, label: 'Domains'),   // index 2
+      ];
+    }
+  }
 
-    // Initialize animation controllers for labels
+  void _initAnimations() {
     _labelControllers = List.generate(
       _navItems.length,
           (index) => AnimationController(
@@ -57,85 +63,33 @@ class _PersistentNavbarState extends State<PersistentNavbar>
         vsync: this,
       ),
     );
-
-    _labelAnimations = _labelControllers
-        .map(
-          (controller) => CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeIn,
-      ),
-    )
-        .toList();
-
-    // Start animation for the initially selected index
-    _labelControllers[_selectedIndex].forward();
+    _labelAnimations = _labelControllers.map((c) {
+      return CurvedAnimation(parent: c, curve: Curves.easeIn);
+    }).toList();
   }
 
   @override
   void didUpdateWidget(covariant PersistentNavbar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.currentIndex != _selectedIndex || widget.isAdmin != oldWidget.isAdmin) {
-      // Handle role change
+      // If user role changed or index changed
       if (widget.isAdmin != oldWidget.isAdmin) {
-        // Update navigation items based on new role
-        setState(() {
-          _navItems = widget.isAdmin
-              ? [
-            _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-            _NavItemData(icon: Icons.apartment, label: 'Organizations'), // 1
-            _NavItemData(icon: Icons.people, label: 'Users'), // 2
-            _NavItemData(icon: Icons.assessment, label: 'Tests'), // 3
-          ]
-              : [
-            _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-            _NavItemData(icon: Icons.people, label: 'Users'), // 1
-            _NavItemData(icon: Icons.assessment, label: 'Tests'), // 2
-          ];
-
-          // Dispose old controllers
-          for (var controller in _labelControllers) {
-            controller.dispose();
-          }
-
-          // Initialize new controllers
-          _labelControllers = List.generate(
-            _navItems.length,
-                (index) => AnimationController(
-              duration: const Duration(milliseconds: 300),
-              vsync: this,
-            ),
-          );
-
-          _labelAnimations = _labelControllers
-              .map(
-                (controller) => CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeIn,
-            ),
-          )
-              .toList();
-
-          // Reset selected index if out of range
-          if (_selectedIndex >= _navItems.length) {
-            _selectedIndex = 0;
-            widget.onItemSelected?.call(_selectedIndex);
-          }
-
-          // Start animation for the selected index
-          _labelControllers[_selectedIndex].forward();
-        });
+        _initNavItems();
+        for (var c in _labelControllers) {
+          c.dispose();
+        }
+        _initAnimations();
+        if (_selectedIndex >= _navItems.length) {
+          _selectedIndex = 0;
+          widget.onItemSelected?.call(_selectedIndex);
+        }
+        _labelControllers[_selectedIndex].forward();
       }
-
       if (widget.currentIndex != _selectedIndex) {
-        // Reverse the previous label animation
         _labelControllers[_selectedIndex].reverse();
-
-        // Update the selected index
         setState(() {
           _selectedIndex = widget.currentIndex;
         });
-
-        // Forward the new label animation
         _labelControllers[_selectedIndex].forward();
       }
     }
@@ -143,9 +97,8 @@ class _PersistentNavbarState extends State<PersistentNavbar>
 
   @override
   void dispose() {
-    // Dispose all animation controllers
-    for (var controller in _labelControllers) {
-      controller.dispose();
+    for (var c in _labelControllers) {
+      c.dispose();
     }
     super.dispose();
   }
@@ -153,47 +106,45 @@ class _PersistentNavbarState extends State<PersistentNavbar>
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200, // Increased width to accommodate labels
+      width: 200,
       color: primaryDarkGreen,
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          const SizedBox(height:24),
           _buildBrandLogo(),
-          const SizedBox(height: 24),
+          const SizedBox(height:24),
           Expanded(
             child: ListView.builder(
               itemCount: _navItems.length,
-              itemBuilder: (ctx, index) {
-                final isSelected = (index == _selectedIndex);
+              itemBuilder: (ctx, i) {
+                final isSelected = (i == _selectedIndex);
                 return GestureDetector(
-                  onTap: () {
-                    if (widget.onItemSelected != null) {
-                      widget.onItemSelected!(index);
-                    }
-                  },
+                  onTap: () => widget.onItemSelected?.call(i),
                   child: _NavItem(
-                    data: _navItems[index],
+                    data: _navItems[i],
                     isSelected: isSelected,
-                    labelAnimation: _labelAnimations[index],
+                    labelAnimation: _labelAnimations[i],
                   ),
                 );
               },
             ),
           ),
-          // Logout Button with Animation
+          // we can do a logout item here if we want
           GestureDetector(
             onTap: () {
-              // Implement logout functionality here
-              // For example:
-              Navigator.pushReplacementNamed(context, '/login');
+              // calling logout from here is optional,
+              // or you can rely on the top bar logout
+              final auth = Provider.of<AuthProvider>(context, listen:false);
+              auth.logout();
+              Navigator.pushReplacementNamed(context, '/');
             },
             child: _NavItem(
               data: _NavItemData(icon: Icons.exit_to_app, label: 'Logout'),
               isSelected: false,
-              labelAnimation: const AlwaysStoppedAnimation(0.0),
+              labelAnimation: const AlwaysStoppedAnimation(0),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height:24),
         ],
       ),
     );
@@ -201,13 +152,12 @@ class _PersistentNavbarState extends State<PersistentNavbar>
 
   Widget _buildBrandLogo() {
     return Container(
-      width: 60,
-      height: 60,
+      width:60, height:60,
       decoration: BoxDecoration(
         color: accentColor,
         borderRadius: BorderRadius.circular(30),
       ),
-      child: const Icon(Icons.dashboard, color: Colors.white, size: 24), // Fixed size
+      child: const Icon(Icons.dashboard, color: Colors.white, size:24),
     );
   }
 }
@@ -215,7 +165,6 @@ class _PersistentNavbarState extends State<PersistentNavbar>
 class _NavItemData {
   final IconData icon;
   final String label;
-
   _NavItemData({required this.icon, required this.label});
 }
 
@@ -233,44 +182,42 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define the duration and curve for icon scaling
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      duration: const Duration(milliseconds:300),
+      margin: const EdgeInsets.symmetric(vertical:8, horizontal:12),
+      padding: const EdgeInsets.symmetric(vertical:12, horizontal:8),
       decoration: BoxDecoration(
         color: isSelected ? accentColor.withOpacity(0.2) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         border: isSelected
-            ? Border.all(color: accentColor, width: 2)
+            ? Border.all(color: accentColor, width:2)
             : Border.all(color: Colors.transparent),
       ),
       child: Row(
         children: [
           AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: isSelected ? 40 : 30,
-            height: isSelected ? 40 : 30,
+            duration: const Duration(milliseconds:300),
+            width: isSelected ? 40 :30,
+            height: isSelected ? 40:30,
             decoration: BoxDecoration(
               color: isSelected ? accentColor : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              data.icon,
-              color: isSelected ? Colors.white : Colors.white70,
-              size: isSelected ? 24 : 20,
+                data.icon,
+                color: isSelected ? Colors.white : Colors.white70,
+                size: isSelected ?24:20
             ),
           ),
-          const SizedBox(width: 12),
-            Text(
-              data.label,
-              style: TextStyle(
+          const SizedBox(width:12),
+          Text(
+            data.label,
+            style: TextStyle(
                 color: Colors.white,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 16,
-              ),
+                fontSize:16
             ),
-
+          ),
         ],
       ),
     );
