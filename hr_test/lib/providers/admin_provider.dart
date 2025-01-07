@@ -1,5 +1,3 @@
-// lib/providers/admin_provider.dart
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/organization.dart';
@@ -9,35 +7,16 @@ import '../models/user.dart';
 import '../models/role.dart';
 import '../models/permission.dart';
 import '../models/test_question.dart';
-import '../test_questions/java_test_questions.dart';
-import '../test_questions/math_test_questions.dart';
+// Remove direct static references like javaTestQuestions or mathTestQuestions here
+// and import from your new static_data.dart
+import '../static/static_data.dart'; // <--- new import
 import '../utils/id_generator.dart';
 
 class AdminProvider with ChangeNotifier {
   // ---------------------------
   // Organizations
   // ---------------------------
-  List<Organization> _organizations = [
-    Organization(
-      id: 1,
-      name: 'HR Department',
-      description: 'Handles all HR related tasks.',
-      createdAt: DateTime.now(),
-    ),
-    Organization(
-      id: 2,
-      name: 'IT Department',
-      description: 'Handles all IT related tasks.',
-      createdAt: DateTime.now(),
-    ),
-    Organization(
-      id: 3,
-      name: 'Marketing Department',
-      description: 'Handles all marketing and advertising tasks.',
-      createdAt: DateTime.now(),
-    ),
-    // Add more organizations as needed
-  ];
+  List<Organization> _organizations = List.from(initialOrganizations);
 
   List<Organization> get organizations => _organizations;
 
@@ -69,9 +48,7 @@ class AdminProvider with ChangeNotifier {
   // ---------------------------
   // Users
   // ---------------------------
-  List<User> _users = [
-    // Initialize with some users if needed
-  ];
+  List<User> _users = [];
 
   List<User> get users => _users;
 
@@ -124,21 +101,7 @@ class AdminProvider with ChangeNotifier {
   // ---------------------------
   // Test Domains
   // ---------------------------
-  List<TestDomain> _testDomains = [
-    TestDomain(
-      id: 1,
-      name: 'Software Engineering',
-      description: 'All software related tests.',
-      createdAt: DateTime.now(),
-    ),
-    TestDomain(
-      id: 2,
-      name: 'Human Resources',
-      description: 'HR related tests and assessments.',
-      createdAt: DateTime.now(),
-    ),
-    // Add more domains as needed
-  ];
+  List<TestDomain> _testDomains = List.from(initialDomains);
 
   List<TestDomain> get testDomains => _testDomains;
 
@@ -164,32 +127,7 @@ class AdminProvider with ChangeNotifier {
   // ---------------------------
   // Tests
   // ---------------------------
-  List<TestModel> _tests = [
-    // Adding static tests "Java" and "Math" with comprehensive questions
-    TestModel(
-      id: 1,
-      code: 'JAVA',
-      name: 'Java Programming Test',
-      grade: 'A',
-      date: DateTime.now(),
-      duration: 60,
-      isActive: true,
-      createdAt: DateTime.now(),
-      domainId: 1, // Assuming 'Software Engineering'
-    ),
-    TestModel(
-      id: 2,
-      code: 'MATH',
-      name: 'Mathematics Test',
-      grade: 'B',
-      date: DateTime.now(),
-      duration: 45,
-      isActive: true,
-      createdAt: DateTime.now(),
-      domainId: 1, // Assuming 'Software Engineering'
-    ),
-    // Add more tests as needed
-  ];
+  List<TestModel> _tests = List.from(initialTests);
 
   List<TestModel> get tests => _tests;
 
@@ -227,7 +165,6 @@ class AdminProvider with ChangeNotifier {
 
   void deleteTest(int id) {
     _tests.removeWhere((test) => test.id == id);
-    // Also remove associated questions
     _testQuestions.removeWhere((q) => q.testId == id);
     notifyListeners();
   }
@@ -235,17 +172,12 @@ class AdminProvider with ChangeNotifier {
   // ---------------------------
   // Test Questions
   // ---------------------------
-  List<TestQuestion> _testQuestions = [
-    // Import and add questions from separate files
-    ...javaTestQuestions,
-    ...mathTestQuestions,
-  ];
+  List<TestQuestion> _testQuestions = List.from(initialQuestions);
 
   List<TestQuestion> get testQuestions => _testQuestions;
 
   void addTestQuestion(TestQuestion question) {
     _testQuestions.add(question);
-    // Since options are part of the question, no need to add them separately
     notifyListeners();
   }
 
@@ -267,6 +199,15 @@ class AdminProvider with ChangeNotifier {
     return _testQuestions.where((q) => q.testId == testId).toList();
   }
 
+  // Add the missing addTestWithQuestions method
+  Future<void> addTestWithQuestions(TestModel test, List<TestQuestion> questions) async {
+    // Add the test
+    _tests.add(test);
+    // Add its questions
+    _testQuestions.addAll(questions);
+    notifyListeners();
+  }
+
   // ---------------------------
   // Unique ID Generators
   // ---------------------------
@@ -285,14 +226,12 @@ class AdminProvider with ChangeNotifier {
     return _tests.map((test) => test.id).reduce((a, b) => a > b ? a : b) + 1;
   }
 
-  // These methods ensure unique IDs by scanning existing questions and options
   int getNextQuestionId() {
     if (_testQuestions.isEmpty) return 1;
     return _testQuestions.map((q) => q.id).reduce((a, b) => a > b ? a : b) + 1;
   }
 
   int getNextOptionId() {
-    // Find the maximum option ID across all questions
     int maxId = 0;
     for (var question in _testQuestions) {
       for (var option in question.options) {
@@ -305,29 +244,36 @@ class AdminProvider with ChangeNotifier {
   }
 
   // ---------------------------
-  // Add Test with Questions via JSON
+  // Assign Tests to Users
   // ---------------------------
-  Future<void> addTestWithQuestions(TestModel test, List<TestQuestion> questions) async {
-    // Add Test
-    _tests.add(test);
+  final Map<int, List<int>> _userAssignedTests = {};
 
-    // Add Questions
-    for (var question in questions) {
-      _testQuestions.add(question);
+  void assignTestsToUser(int userId, List<int> testIds) {
+    final existing = _userAssignedTests[userId] ?? [];
+    final updated = [...existing];
+    for (var tId in testIds) {
+      if (!updated.contains(tId)) {
+        updated.add(tId);
+      }
     }
-
+    _userAssignedTests[userId] = updated;
     notifyListeners();
   }
 
-  // ---------------------------
-  // Generate Test Key Methods
-  // ---------------------------
+  List<int> getAssignedTestIdsForUser(int userId) {
+    return _userAssignedTests[userId] ?? [];
+  }
 
+  List<TestModel> getAssignedTestsForUser(int userId) {
+    final assignedIds = getAssignedTestIdsForUser(userId);
+    return _tests.where((t) => assignedIds.contains(t.id)).toList();
+  }
+
+  // ---------------------------
+  // Generate Test Key
+  // ---------------------------
   final Map<String, List<TestQuestion>> _testKeys = {};
 
-  /// Generates a unique test key for a given test ID.
-  /// Selects 10 MCQs: 4 Easy, 3 Medium, 3 Hard.
-  /// Throws an exception if insufficient questions are available.
   String generateTestKey(int testId) {
     final testQuestions = getQuestionsByTestId(testId);
     final easy = testQuestions.where((q) => q.type == QuestionType.easy).toList();
@@ -338,7 +284,6 @@ class AdminProvider with ChangeNotifier {
       throw Exception("Insufficient questions to generate the test.");
     }
 
-    // Shuffle and select required number of questions
     easy.shuffle();
     medium.shuffle();
     hard.shuffle();
@@ -349,18 +294,15 @@ class AdminProvider with ChangeNotifier {
       ...hard.sublist(0, 3),
     ];
 
-    // Generate a unique 6-digit key
     String key;
     do {
       key = Random().nextInt(1000000).toString().padLeft(6, '0');
-    } while (_testKeys.containsKey(key)); // Ensure uniqueness
+    } while (_testKeys.containsKey(key));
 
     _testKeys[key] = selectedQuestions;
     notifyListeners();
-
     return key;
   }
 
-  /// Retrieves the list of questions associated with a given test key.
   List<TestQuestion>? getTestByKey(String key) => _testKeys[key];
 }

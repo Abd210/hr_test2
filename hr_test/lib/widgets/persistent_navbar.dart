@@ -1,5 +1,3 @@
-// lib/widgets/persistent_navbar.dart
-
 import 'package:flutter/material.dart';
 import '../utils/theme.dart';
 
@@ -12,7 +10,7 @@ class PersistentNavbar extends StatefulWidget {
     Key? key,
     required this.currentIndex,
     this.onItemSelected,
-    this.isAdmin = true, // Default to Admin
+    this.isAdmin = true,
   }) : super(key: key);
 
   @override
@@ -22,34 +20,37 @@ class PersistentNavbar extends StatefulWidget {
 class _PersistentNavbarState extends State<PersistentNavbar>
     with TickerProviderStateMixin {
   late int _selectedIndex;
-
-  // Animation Controllers for labels
   late List<AnimationController> _labelControllers;
   late List<Animation<double>> _labelAnimations;
-
-  // Define navigation items based on the user role
-  late final List<_NavItemData> _navItems;
+  late List<_NavItemData> _navItems;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.currentIndex;
+    _initNavItems();
+    _initAnimations();
+    _labelControllers[_selectedIndex].forward();
+  }
 
-    // Initialize navigation items based on isAdmin
-    _navItems = widget.isAdmin
-        ? [
-      _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-      _NavItemData(icon: Icons.apartment, label: 'Organizations'), // 1
-      _NavItemData(icon: Icons.people, label: 'Users'), // 2
-      _NavItemData(icon: Icons.assessment, label: 'Tests'), // 3
-    ]
-        : [
-      _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-      _NavItemData(icon: Icons.people, label: 'Users'), // 1
-      _NavItemData(icon: Icons.assessment, label: 'Tests'), // 2
-    ];
+  void _initNavItems() {
+    if (widget.isAdmin) {
+      _navItems = [
+        _NavItemData(icon: Icons.dashboard, label: 'Dashboard'),    // 0
+        _NavItemData(icon: Icons.apartment, label: 'Organizations'),// 1
+        _NavItemData(icon: Icons.people, label: 'Users'),           // 2
+        _NavItemData(icon: Icons.assessment, label: 'Domains'),     // 3 (changed label)
+      ];
+    } else {
+      _navItems = [
+        _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
+        _NavItemData(icon: Icons.people, label: 'Users'),        // 1
+        _NavItemData(icon: Icons.assessment, label: 'Domains'),  // 2 (changed label)
+      ];
+    }
+  }
 
-    // Initialize animation controllers for labels
+  void _initAnimations() {
     _labelControllers = List.generate(
       _navItems.length,
           (index) => AnimationController(
@@ -58,84 +59,35 @@ class _PersistentNavbarState extends State<PersistentNavbar>
       ),
     );
 
-    _labelAnimations = _labelControllers
-        .map(
-          (controller) => CurvedAnimation(
+    _labelAnimations = _labelControllers.map((controller) {
+      return CurvedAnimation(
         parent: controller,
         curve: Curves.easeIn,
-      ),
-    )
-        .toList();
-
-    // Start animation for the initially selected index
-    _labelControllers[_selectedIndex].forward();
+      );
+    }).toList();
   }
 
   @override
   void didUpdateWidget(covariant PersistentNavbar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.currentIndex != _selectedIndex || widget.isAdmin != oldWidget.isAdmin) {
-      // Handle role change
       if (widget.isAdmin != oldWidget.isAdmin) {
-        // Update navigation items based on new role
-        setState(() {
-          _navItems = widget.isAdmin
-              ? [
-            _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-            _NavItemData(icon: Icons.apartment, label: 'Organizations'), // 1
-            _NavItemData(icon: Icons.people, label: 'Users'), // 2
-            _NavItemData(icon: Icons.assessment, label: 'Tests'), // 3
-          ]
-              : [
-            _NavItemData(icon: Icons.dashboard, label: 'Dashboard'), // 0
-            _NavItemData(icon: Icons.people, label: 'Users'), // 1
-            _NavItemData(icon: Icons.assessment, label: 'Tests'), // 2
-          ];
-
-          // Dispose old controllers
-          for (var controller in _labelControllers) {
-            controller.dispose();
-          }
-
-          // Initialize new controllers
-          _labelControllers = List.generate(
-            _navItems.length,
-                (index) => AnimationController(
-              duration: const Duration(milliseconds: 300),
-              vsync: this,
-            ),
-          );
-
-          _labelAnimations = _labelControllers
-              .map(
-                (controller) => CurvedAnimation(
-              parent: controller,
-              curve: Curves.easeIn,
-            ),
-          )
-              .toList();
-
-          // Reset selected index if out of range
-          if (_selectedIndex >= _navItems.length) {
-            _selectedIndex = 0;
-            widget.onItemSelected?.call(_selectedIndex);
-          }
-
-          // Start animation for the selected index
-          _labelControllers[_selectedIndex].forward();
-        });
+        _initNavItems();
+        for (var c in _labelControllers) {
+          c.dispose();
+        }
+        _initAnimations();
+        if (_selectedIndex >= _navItems.length) {
+          _selectedIndex = 0;
+          widget.onItemSelected?.call(_selectedIndex);
+        }
+        _labelControllers[_selectedIndex].forward();
       }
-
       if (widget.currentIndex != _selectedIndex) {
-        // Reverse the previous label animation
         _labelControllers[_selectedIndex].reverse();
-
-        // Update the selected index
         setState(() {
           _selectedIndex = widget.currentIndex;
         });
-
-        // Forward the new label animation
         _labelControllers[_selectedIndex].forward();
       }
     }
@@ -143,7 +95,6 @@ class _PersistentNavbarState extends State<PersistentNavbar>
 
   @override
   void dispose() {
-    // Dispose all animation controllers
     for (var controller in _labelControllers) {
       controller.dispose();
     }
@@ -153,7 +104,7 @@ class _PersistentNavbarState extends State<PersistentNavbar>
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200, // Increased width to accommodate labels
+      width: 200,
       color: primaryDarkGreen,
       child: Column(
         children: [
@@ -180,11 +131,8 @@ class _PersistentNavbarState extends State<PersistentNavbar>
               },
             ),
           ),
-          // Logout Button with Animation
           GestureDetector(
             onTap: () {
-              // Implement logout functionality here
-              // For example:
               Navigator.pushReplacementNamed(context, '/login');
             },
             child: _NavItem(
@@ -207,7 +155,7 @@ class _PersistentNavbarState extends State<PersistentNavbar>
         color: accentColor,
         borderRadius: BorderRadius.circular(30),
       ),
-      child: const Icon(Icons.dashboard, color: Colors.white, size: 24), // Fixed size
+      child: const Icon(Icons.dashboard, color: Colors.white, size: 24),
     );
   }
 }
@@ -215,7 +163,6 @@ class _PersistentNavbarState extends State<PersistentNavbar>
 class _NavItemData {
   final IconData icon;
   final String label;
-
   _NavItemData({required this.icon, required this.label});
 }
 
@@ -233,7 +180,6 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define the duration and curve for icon scaling
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -262,15 +208,14 @@ class _NavItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-            Text(
-              data.label,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 16,
-              ),
+          Text(
+            data.label,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 16,
             ),
-
+          ),
         ],
       ),
     );
