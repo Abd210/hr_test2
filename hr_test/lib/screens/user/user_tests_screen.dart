@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../models/test_question.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/admin_provider.dart';
-import '../../models/test_model.dart';
 import '../test_screen.dart';
 import '../../widgets/background_animation.dart';
 import '../../widgets/custom_button.dart';
@@ -19,66 +19,123 @@ class _UserTestsScreenState extends State<UserTestsScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final adminProvider = Provider.of<AdminProvider>(context);
-    final user = authProvider.currentUser;
 
+    final user = authProvider.currentUser;
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('No user logged in.')),
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('User Tests'),
+        ),
+        body: const Center(
+          child: Text('User not recognized. Please login again.'),
+        ),
       );
     }
 
     final assignedTests = adminProvider.getAssignedTestsForUser(user.id);
 
     return Scaffold(
+      // We'll use an AppBar with the user name
+      appBar: AppBar(
+        title: Text('${user.username}\'s Tests'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () {
+              authProvider.logout();
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           const BackgroundAnimation(),
           Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 800),
+              constraints: const BoxConstraints(maxWidth: 900),
               padding: const EdgeInsets.all(16.0),
               child: Card(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withOpacity(0.94),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                elevation: 10,
+                elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 24.0, vertical: 32.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${user.username}\'s Assigned Tests',
+                        'Hello, ${user.username}!',
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
-                          fontSize: 22,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Below are the tests assigned to you. Tap "Start" to begin any test.',
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 16,
                         ),
                       ),
                       const SizedBox(height: 24),
                       if (assignedTests.isEmpty)
-                        const Text('No tests assigned.'),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              'No tests assigned.',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
                       if (assignedTests.isNotEmpty)
                         Expanded(
                           child: ListView.builder(
                             itemCount: assignedTests.length,
                             itemBuilder: (ctx, index) {
                               final test = assignedTests[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8),
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
                                 child: ListTile(
-                                  title: Text(test.name),
+                                  title: Text(
+                                    test.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                   subtitle: Text(
-                                      'Duration: ${test.duration} mins\nGrade: ${test.grade}'),
+                                    'Duration: ${test.duration} mins | Grade: ${test.grade}\n'
+                                        'Status: ${test.isActive ? "Active" : "Inactive"}',
+                                  ),
                                   isThreeLine: true,
                                   trailing: CustomButton(
                                     text: 'Start',
                                     icon: Icons.play_arrow,
-                                    onPressed: () {
-                                      _startTest(context, test.id);
-                                    },
+                                    color: Theme.of(context).primaryColor,
+                                    onPressed: test.isActive
+                                        ? () => _startTest(context, test.id)
+                                        : null,
                                   ),
                                 ),
                               );

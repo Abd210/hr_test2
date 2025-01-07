@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:hr_test/screens/organization/tabs/users_tab/domain_tab_org.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/admin_provider.dart';
 import '../../widgets/persistent_navbar.dart';
 import '../../widgets/background_animation.dart';
-import '../admin/tabs/dashboard_tab/dashboard_tab.dart';
-import '../organization/tabs/users_tab/organization_users_tab.dart';
+import '../../utils/theme.dart';
 
-// Reuse the new DomainTab in organizations as well
-import '../../screens/admin/tabs/domain_tab/domain_tab.dart';
+// Example reused from admin
+import '../admin/tabs/dashboard_tab/dashboard_tab.dart';
+
+import 'tabs/users_tab/organization_users_tab.dart';
 
 class OrganizationScreen extends StatefulWidget {
   const OrganizationScreen({Key? key}) : super(key: key);
@@ -25,24 +27,36 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final organization = authProvider.currentOrganization;
 
+    // If for some reason organization is null, maybe show an error or redirect
+    if (organization == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: const Center(
+          child: Text('No organization found. Please login as organization.'),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Stack(
         children: [
           const BackgroundAnimation(),
+
           Row(
             children: [
+              // left persistent navbar with isAdmin=false
               PersistentNavbar(
                 currentIndex: _currentIndex,
                 onItemSelected: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
+                  setState(() => _currentIndex = index);
                 },
                 isAdmin: false,
               ),
+
               Expanded(
                 child: Column(
                   children: [
+                    // top bar
                     Container(
                       height: 60,
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -50,7 +64,7 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
                       child: Row(
                         children: [
                           Text(
-                            '${organization?.name ?? 'Organization'} Dashboard',
+                            '${organization.name} Dashboard',
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 20,
@@ -70,14 +84,18 @@ class _OrganizationScreenState extends State<OrganizationScreen> {
                         ],
                       ),
                     ),
+
+                    // body => your tabs
                     Expanded(
                       child: IndexedStack(
                         index: _currentIndex,
-                        children: const [
-                          DashboardScreen(),
-                          OrganizationUsersTab(),
-                          // Now show DomainTab to allow assigning tests from an org perspective
-                          DomainTab(),
+                        children: [
+                          // 0 => Dashboard
+                          const DashboardScreen(),
+                          // 1 => OrganizationUsersTab
+                          const OrganizationUsersTab(),
+                          // 2 => DomainTabOrg, but we pass "organization"
+                          DomainTabOrg(organization: organization),
                         ],
                       ),
                     ),

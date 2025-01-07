@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+// Models
 import '../models/organization.dart';
 import '../models/test_model.dart';
 import '../models/test_domain.dart';
@@ -7,17 +8,22 @@ import '../models/user.dart';
 import '../models/role.dart';
 import '../models/permission.dart';
 import '../models/test_question.dart';
-// Remove direct static references like javaTestQuestions or mathTestQuestions here
-// and import from your new static_data.dart
-import '../static/static_data.dart'; // <--- new import
+import '../models/test_question_option.dart';
+// Some folks also had references to "javaTestQuestions" or "mathTestQuestions"
+// but typically that's in static_data or separate test_questions files
+
+// Your static data reference
+import '../static/static_data.dart'; // Must define initialOrganizations, etc.
+
+// For ID generation
 import '../utils/id_generator.dart';
 
 class AdminProvider with ChangeNotifier {
-  // ---------------------------
-  // Organizations
-  // ---------------------------
+  // -------------------------------------------------
+  // 1) Organizations
+  // -------------------------------------------------
+  // Pull from static data:
   List<Organization> _organizations = List.from(initialOrganizations);
-
   List<Organization> get organizations => _organizations;
 
   void addOrganization(String name, String description) {
@@ -32,10 +38,10 @@ class AdminProvider with ChangeNotifier {
   }
 
   void updateOrganization(int id, String name, String description) {
-    final orgIndex = _organizations.indexWhere((org) => org.id == id);
-    if (orgIndex != -1) {
-      _organizations[orgIndex].name = name;
-      _organizations[orgIndex].description = description;
+    final idx = _organizations.indexWhere((org) => org.id == id);
+    if (idx != -1) {
+      _organizations[idx].name = name;
+      _organizations[idx].description = description;
       notifyListeners();
     }
   }
@@ -45,11 +51,16 @@ class AdminProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ---------------------------
-  // Users
-  // ---------------------------
-  List<User> _users = [];
+  // Generate unique org ID by scanning existing
+  int generateOrganizationId() {
+    if (_organizations.isEmpty) return 1;
+    return _organizations.map((o) => o.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
 
+  // -------------------------------------------------
+  // 2) Users
+  // -------------------------------------------------
+  List<User> _users = List.from(initialUsers);
   List<User> get users => _users;
 
   void addUser({
@@ -82,7 +93,7 @@ class AdminProvider with ChangeNotifier {
     required List<Role> roles,
     required Organization organization,
   }) {
-    final userIndex = _users.indexWhere((user) => user.id == id);
+    final userIndex = _users.indexWhere((u) => u.id == id);
     if (userIndex != -1) {
       _users[userIndex].username = username;
       _users[userIndex].email = email;
@@ -94,15 +105,19 @@ class AdminProvider with ChangeNotifier {
   }
 
   void deleteUser(int id) {
-    _users.removeWhere((user) => user.id == id);
+    _users.removeWhere((u) => u.id == id);
     notifyListeners();
   }
 
-  // ---------------------------
-  // Test Domains
-  // ---------------------------
-  List<TestDomain> _testDomains = List.from(initialDomains);
+  int generateUserId() {
+    if (_users.isEmpty) return 1;
+    return _users.map((u) => u.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
 
+  // -------------------------------------------------
+  // 3) Test Domains
+  // -------------------------------------------------
+  List<TestDomain> _testDomains = List.from(initialDomains);
   List<TestDomain> get testDomains => _testDomains;
 
   void addTestDomain(TestDomain domain) {
@@ -111,24 +126,22 @@ class AdminProvider with ChangeNotifier {
   }
 
   void updateTestDomain(TestDomain updatedDomain) {
-    final domainIndex =
-    _testDomains.indexWhere((domain) => domain.id == updatedDomain.id);
-    if (domainIndex != -1) {
-      _testDomains[domainIndex] = updatedDomain;
+    final idx = _testDomains.indexWhere((d) => d.id == updatedDomain.id);
+    if (idx != -1) {
+      _testDomains[idx] = updatedDomain;
       notifyListeners();
     }
   }
 
   void deleteTestDomain(int id) {
-    _testDomains.removeWhere((domain) => domain.id == id);
+    _testDomains.removeWhere((dom) => dom.id == id);
     notifyListeners();
   }
 
-  // ---------------------------
-  // Tests
-  // ---------------------------
+  // -------------------------------------------------
+  // 4) Tests
+  // -------------------------------------------------
   List<TestModel> _tests = List.from(initialTests);
-
   List<TestModel> get tests => _tests;
 
   void addTest({
@@ -156,24 +169,30 @@ class AdminProvider with ChangeNotifier {
   }
 
   void updateTest(TestModel updatedTest) {
-    final testIndex = _tests.indexWhere((test) => test.id == updatedTest.id);
-    if (testIndex != -1) {
-      _tests[testIndex] = updatedTest;
+    final idx = _tests.indexWhere((t) => t.id == updatedTest.id);
+    if (idx != -1) {
+      _tests[idx] = updatedTest;
       notifyListeners();
     }
   }
 
   void deleteTest(int id) {
-    _tests.removeWhere((test) => test.id == id);
+    _tests.removeWhere((t) => t.id == id);
+    // also remove associated questions
     _testQuestions.removeWhere((q) => q.testId == id);
     notifyListeners();
   }
 
-  // ---------------------------
-  // Test Questions
-  // ---------------------------
-  List<TestQuestion> _testQuestions = List.from(initialQuestions);
+  int generateTestId() {
+    if (_tests.isEmpty) return 1;
+    return _tests.map((t) => t.id).reduce((a, b) => a > b ? a : b) + 1;
+  }
 
+  // -------------------------------------------------
+  // 5) Test Questions
+  // -------------------------------------------------
+  // Start with the initial questions from static_data
+  List<TestQuestion> _testQuestions = List.from(initialQuestions);
   List<TestQuestion> get testQuestions => _testQuestions;
 
   void addTestQuestion(TestQuestion question) {
@@ -182,10 +201,9 @@ class AdminProvider with ChangeNotifier {
   }
 
   void updateTestQuestion(TestQuestion updatedQuestion) {
-    final questionIndex =
-    _testQuestions.indexWhere((q) => q.id == updatedQuestion.id);
-    if (questionIndex != -1) {
-      _testQuestions[questionIndex] = updatedQuestion;
+    final idx = _testQuestions.indexWhere((q) => q.id == updatedQuestion.id);
+    if (idx != -1) {
+      _testQuestions[idx] = updatedQuestion;
       notifyListeners();
     }
   }
@@ -199,33 +217,13 @@ class AdminProvider with ChangeNotifier {
     return _testQuestions.where((q) => q.testId == testId).toList();
   }
 
-  // Add the missing addTestWithQuestions method
   Future<void> addTestWithQuestions(TestModel test, List<TestQuestion> questions) async {
-    // Add the test
     _tests.add(test);
-    // Add its questions
     _testQuestions.addAll(questions);
     notifyListeners();
   }
 
-  // ---------------------------
-  // Unique ID Generators
-  // ---------------------------
-  int generateOrganizationId() {
-    if (_organizations.isEmpty) return 1;
-    return _organizations.map((org) => org.id).reduce((a, b) => a > b ? a : b) + 1;
-  }
-
-  int generateUserId() {
-    if (_users.isEmpty) return 1;
-    return _users.map((user) => user.id).reduce((a, b) => a > b ? a : b) + 1;
-  }
-
-  int generateTestId() {
-    if (_tests.isEmpty) return 1;
-    return _tests.map((test) => test.id).reduce((a, b) => a > b ? a : b) + 1;
-  }
-
+  // ID generator helpers for questions & options
   int getNextQuestionId() {
     if (_testQuestions.isEmpty) return 1;
     return _testQuestions.map((q) => q.id).reduce((a, b) => a > b ? a : b) + 1;
@@ -233,19 +231,17 @@ class AdminProvider with ChangeNotifier {
 
   int getNextOptionId() {
     int maxId = 0;
-    for (var question in _testQuestions) {
-      for (var option in question.options) {
-        if (option.id > maxId) {
-          maxId = option.id;
-        }
+    for (var q in _testQuestions) {
+      for (var o in q.options) {
+        if (o.id > maxId) maxId = o.id;
       }
     }
     return maxId + 1;
   }
 
-  // ---------------------------
-  // Assign Tests to Users
-  // ---------------------------
+  // -------------------------------------------------
+  // 6) Assign Tests to Users
+  // -------------------------------------------------
   final Map<int, List<int>> _userAssignedTests = {};
 
   void assignTestsToUser(int userId, List<int> testIds) {
@@ -269,37 +265,39 @@ class AdminProvider with ChangeNotifier {
     return _tests.where((t) => assignedIds.contains(t.id)).toList();
   }
 
-  // ---------------------------
-  // Generate Test Key
-  // ---------------------------
+  // -------------------------------------------------
+  // 7) Generate Test Key Logic (if you use that)
+  // -------------------------------------------------
   final Map<String, List<TestQuestion>> _testKeys = {};
 
   String generateTestKey(int testId) {
-    final testQuestions = getQuestionsByTestId(testId);
-    final easy = testQuestions.where((q) => q.type == QuestionType.easy).toList();
-    final medium = testQuestions.where((q) => q.type == QuestionType.medium).toList();
-    final hard = testQuestions.where((q) => q.type == QuestionType.hard).toList();
+    final questions = getQuestionsByTestId(testId);
+    final easy = questions.where((q) => q.type == QuestionType.easy).toList();
+    final medium = questions.where((q) => q.type == QuestionType.medium).toList();
+    final hard = questions.where((q) => q.type == QuestionType.hard).toList();
 
     if (easy.length < 4 || medium.length < 3 || hard.length < 3) {
       throw Exception("Insufficient questions to generate the test.");
     }
 
+    // shuffle and pick
     easy.shuffle();
     medium.shuffle();
     hard.shuffle();
 
-    final selectedQuestions = [
+    final selected = [
       ...easy.sublist(0, 4),
       ...medium.sublist(0, 3),
       ...hard.sublist(0, 3),
     ];
 
+    // generate unique key
     String key;
     do {
       key = Random().nextInt(1000000).toString().padLeft(6, '0');
     } while (_testKeys.containsKey(key));
 
-    _testKeys[key] = selectedQuestions;
+    _testKeys[key] = selected;
     notifyListeners();
     return key;
   }

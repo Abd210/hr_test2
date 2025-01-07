@@ -1,5 +1,3 @@
-// lib/screens/login_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/organization.dart';
@@ -8,16 +6,14 @@ import '../providers/auth_provider.dart';
 import '../providers/admin_provider.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import 'test_screen.dart'; // Ensure you have a TestScreen to display the test
+import 'test_screen.dart';
 import 'admin/admin_screen.dart';
 import 'organization/organization_screen.dart';
-import '../widgets/background_animation.dart'; // Import the BackgroundAnimation widget
+import 'user/user_tests_screen.dart';
+import '../widgets/background_animation.dart';
+import '../utils/constants.dart';
 
-/// Example palette for background:
-const Color primaryDarkGreen = Color(0xFF1F4529);
-const Color secondaryGreen = Color(0xFF47663B);
-const Color backgroundLight = Color(0xFFE8ECD7);
-const Color accentColor = Color(0xFFEED3B1);
+enum LoginMode { Admin, Organization, User }
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -26,27 +22,27 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-enum LoginMode { Admin, Organization }
-
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controllers for Admin Login
+  // Admin Login
   final TextEditingController _adminUsernameController =
-  TextEditingController(text: 'superadmin'); // Pre-filled username
+  TextEditingController(text: 'superadmin');
   final TextEditingController _adminPasswordController =
-  TextEditingController(text: 'admin123'); // Pre-filled password
+  TextEditingController(text: 'admin123');
 
-  // Controller for Organization Login
+  // Organization Login
   final TextEditingController _organizationNameController =
-  TextEditingController(text: 'HR department');
-  final TextEditingController _organizationPasswordController=
+  TextEditingController(text: 'HR Department');
+  final TextEditingController _organizationPasswordController =
   TextEditingController();
 
+  // User Login (username-only)
+  final TextEditingController _userUsernameController =
+  TextEditingController(text: 'john_hr');
 
   bool _passwordVisible = false;
   String _error = '';
-
   LoginMode _loginMode = LoginMode.Admin;
 
   @override
@@ -54,115 +50,86 @@ class _LoginScreenState extends State<LoginScreen> {
     _adminUsernameController.dispose();
     _adminPasswordController.dispose();
     _organizationNameController.dispose();
+    _organizationPasswordController.dispose();
+    _userUsernameController.dispose();
     super.dispose();
   }
 
-  /// Attempts to log in either as an admin, organization, or using a test key.
   void _attemptLogin(AuthProvider authProvider, AdminProvider adminProvider) {
+    setState(() => _error = '');
     if (_loginMode == LoginMode.Admin) {
       final username = _adminUsernameController.text.trim();
       final password = _adminPasswordController.text.trim();
-
       if (username.isEmpty || password.isEmpty) {
-        setState(() {
-          _error = 'Please enter both username and password.';
-        });
+        setState(() => _error = 'Please enter both username and password.');
         return;
       }
-
-      // Check if the input matches any user's credentials
-      final user = authProvider.allUsers.firstWhere(
-            (u) => u.username == username && u.password == password,
-        orElse: () => User(
-            id: -1,
-            username: '',
-            email: '',
-            password: '',
-            phoneNumber: '',
-            createdAt: DateTime.now(),
-            roles: [],
-            organization: Organization(
-                id: 0, name: '', description: '', createdAt: DateTime.now())),
-      );
-
-      if (user.id != -1) {
-        // Valid user credentials
-        final success = authProvider.login(username, password);
-        if (success) {
-          if (user.roles.any((r) => r.roleName == 'SuperAdmin')) {
+      final success = authProvider.login(username, password);
+      if (success) {
+        final user = authProvider.currentUser!;
+        // If user password didn't match a real user, it might be a test key
+        if (user.id != -1) {
+          // If user is superAdmin or admin, go AdminScreen
+          if (user.roles.any((r) => r.roleName == Constants.superAdminRole) ||
+              user.roles.any((r) => r.roleName == Constants.adminRole)) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const AdminScreen()),
             );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Logged in as admin'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            // Navigate to admin-specific dashboard or home
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AdminScreen()),
-            );
+            return;
           }
-        } else {
-          setState(() {
-            _error = 'Invalid credentials. Please try again.';
-          });
         }
-        return;
       }
-
-      // If not a valid user, treat the password field as a test key
+      // If not found, check if it's a test key
       final questions = adminProvider.getTestByKey(password);
       if (questions != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => TestScreen(questions: questions),
-          ),
+          MaterialPageRoute(builder: (context) => TestScreen(questions: questions)),
         );
         return;
       }
+      setState(() => _error = 'Invalid credentials or test key.');
+    }
 
-      // If neither, show error
-      setState(() {
-        _error = 'Invalid credentials or test key.';
-      });
-    } else {
-      // Organization Login Mode
-      final organizationName = _organizationNameController.text.trim();
-
-      if (organizationName.isEmpty) {
-        setState(() {
-          _error = 'Please enter an organization name.';
-        });
+    else if (_loginMode == LoginMode.Organization) {
+      final orgName = _organizationNameController.text.trim();
+      if (orgName.isEmpty) {
+        setState(() => _error = 'Please enter an organization name.');
         return;
       }
-
-      // Attempt organization login
       final organization = adminProvider.organizations.firstWhere(
-            (org) => org.name.toLowerCase() == organizationName.toLowerCase(),
-        orElse: () => Organization(
-            id: -1,
-            name: '',
-            description: '',
-            createdAt: DateTime.now()),
+            (org) => org.name.toLowerCase() == orgName.toLowerCase(),
+        orElse: () => Organization(id: -1, name: '', description: '', createdAt: DateTime.now()),
       );
-
       if (organization.id != -1) {
-        // Valid organization
         authProvider.loginAsOrganization(organization);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const OrganizationScreen()),
         );
       } else {
-        setState(() {
-          _error = 'Organization not found. Please try again.';
-        });
+        setState(() => _error = 'Organization not found.');
+      }
+    }
+
+    else {
+      // LoginMode.User => username only
+      final enteredUsername = _userUsernameController.text.trim();
+      if (enteredUsername.isEmpty) {
+        setState(() => _error = 'Please enter your username.');
+        return;
+      }
+      // Let AuthProvider handle it
+      authProvider.loginAsNormalUser(enteredUsername);
+      if (authProvider.currentUser != null &&
+          authProvider.currentUser!.id != -1) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const UserTestsScreen()),
+        );
+      } else {
+        setState(() => _error = 'No user found with username "$enteredUsername".');
       }
     }
   }
@@ -173,33 +140,26 @@ class _LoginScreenState extends State<LoginScreen> {
     final adminProvider = Provider.of<AdminProvider>(context);
 
     return Scaffold(
-      // Use Stack to layer BackgroundAnimation behind the login form
       body: Stack(
         children: [
-          // Animated Background
           const BackgroundAnimation(),
-
-          // Semi-transparent overlay to enhance readability
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  secondaryGreen.withOpacity(0.6),
-                  primaryDarkGreen.withOpacity(0.6),
+                  Colors.green.withOpacity(0.6),
+                  Colors.teal.withOpacity(0.6),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
             ),
           ),
-
-          // Centered Login Form
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                // Slightly more refined card with transparency effect
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.85),
                   borderRadius: BorderRadius.circular(16),
@@ -208,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.black12,
                       blurRadius: 10,
                       offset: const Offset(0, 4),
-                    )
+                    ),
                   ],
                 ),
                 child: Padding(
@@ -220,69 +180,87 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           'HR Tester Login',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 24),
-                        // Toggle between Admin and Organization Login
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ChoiceChip(
                               label: const Text('Admin'),
                               selected: _loginMode == LoginMode.Admin,
-                              onSelected: (selected) {
+                              onSelected: (sel) {
                                 setState(() {
                                   _loginMode = LoginMode.Admin;
                                   _error = '';
                                 });
                               },
-                              selectedColor: accentColor.withOpacity(0.7),
+                              selectedColor: Colors.orangeAccent.withOpacity(0.7),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 12),
                             ChoiceChip(
                               label: const Text('Organization'),
                               selected: _loginMode == LoginMode.Organization,
-                              onSelected: (selected) {
+                              onSelected: (sel) {
                                 setState(() {
                                   _loginMode = LoginMode.Organization;
                                   _error = '';
                                 });
                               },
-                              selectedColor: accentColor.withOpacity(0.7),
+                              selectedColor: Colors.orangeAccent.withOpacity(0.7),
+                            ),
+                            const SizedBox(width: 12),
+                            ChoiceChip(
+                              label: const Text('User'),
+                              selected: _loginMode == LoginMode.User,
+                              onSelected: (sel) {
+                                setState(() {
+                                  _loginMode = LoginMode.User;
+                                  _error = '';
+                                });
+                              },
+                              selectedColor: Colors.orangeAccent.withOpacity(0.7),
                             ),
                           ],
                         ),
                         const SizedBox(height: 24),
-                        // Admin Login Fields
+
                         if (_loginMode == LoginMode.Admin) ...[
-                          // Username Field (Pre-filled for SuperAdmin)
                           CustomTextField(
                             label: 'Username',
                             controller: _adminUsernameController,
-                            validator: (value) => (value == null || value.isEmpty)
-                                ? 'Enter username or leave blank for test key'
-                                : null,
                           ),
                           const SizedBox(height: 16),
-                          // Password Field (Pre-filled for SuperAdmin)
                           CustomTextField(
                             label: 'Password / Test Key',
                             controller: _adminPasswordController,
                             obscureText: !_passwordVisible,
-                            validator: (value) => (value == null || value.isEmpty)
-                                ? 'Enter password or test key'
-                                : null,
                             suffixIcon: IconButton(
                               onPressed: () {
-                                setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                });
+                                setState(() => _passwordVisible = !_passwordVisible);
+                              },
+                              icon: Icon(
+                                _passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                            ),
+                          ),
+                        ] else if (_loginMode == LoginMode.Organization) ...[
+                          CustomTextField(
+                            label: 'Organization Name',
+                            controller: _organizationNameController,
+                          ),
+                          CustomTextField(
+                            label: 'Password (Optional)',
+                            controller: _organizationPasswordController,
+                            obscureText: !_passwordVisible,
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() => _passwordVisible = !_passwordVisible);
                               },
                               icon: Icon(
                                 _passwordVisible
@@ -292,40 +270,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ] else ...[
-                          // Organization Login Field
                           CustomTextField(
-                            label: 'Organization Name',
-                            controller: _organizationNameController,
-                            validator: (value) => (value == null || value.isEmpty)
-                                ? 'Enter organization name'
-                                : null,
+                            label: 'Username',
+                            controller: _userUsernameController,
                           ),
-                          CustomTextField(
-                            label: 'Password',
-                            controller: _organizationPasswordController,
-                            obscureText: !_passwordVisible,
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                });
-                              },
-                              icon: Icon(
-                                _passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                            ),
-                          ),
-
                         ],
                         const SizedBox(height: 24),
-                        // Login Button
+
                         CustomButton(
                           text: 'Login',
                           icon: Icons.login,
-                          onPressed: () =>
-                              _attemptLogin(authProvider, adminProvider),
+                          onPressed: () => _attemptLogin(authProvider, adminProvider),
                           width: double.infinity,
                         ),
                         if (_error.isNotEmpty)
